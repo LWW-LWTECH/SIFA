@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>SIFA Example</title></head>
+<body>
+
+<div class="sifa-input" id="shipping-field">
+    <label for="shipping">Shipping Method</label>
+    <select id="shipping" name="shipping">
+        <option value="">Select...</option>
+        <option value="pickup">Click & Collect</option>
+        <option value="deliver">Home Delivery</option>
+    </select>
+</div>
+
+<section id="delivery-address">
+    <div class="sifa-input" id="address-field">
+        <label for="address">Delivery Address</label>
+        <input type="text" id="address" name="address" />
+    </div>
+</section>
+
+<button id="save-btn">Submit Order</button>
+
+<script type="module">
+import { SifaEngine } from '../sifa.engine.js';
+
+new SifaEngine({
+    debug: false,
+
+    rules: [
+        {
+            event: 'LOAD',
+            enable: true,
+            rules: [
+                {
+                    ref: 'hide_delivery_on_load',
+                    enable: true,
+                    priority: 0,
+                    active: 'true',
+                    condition: 'true',
+                    true_actions: ['sifa_hideElement("group_delivery_address")'],
+                    false_actions: []
+                }
+            ]
+        },
+        {
+            event: 'CHANGE',
+            enable: true,
+            rules: [
+                {
+                    ref: 'toggle_delivery_address',
+                    enable: true,
+                    priority: 0,
+                    active: 'sifa_triggeredField("field_shipping")',
+                    condition: 'sifa_answerEquals("field_shipping", "deliver")',
+                    true_actions: ['sifa_showElement("group_delivery_address")'],
+                    false_actions: [
+                        'sifa_hideElement("group_delivery_address")',
+                        'sifa_clearGroup("group_delivery_address")'
+                    ]
+                }
+            ]
+        }
+    ],
+
+    validationRules: [
+        {
+            ref: 'address_required',
+            enable: true,
+            condition: 'sifa_answerEquals("field_shipping", "deliver") && sifa_inputIsEmpty("field_address")',
+            true_message:  'Please enter a delivery address',
+            false_message: ''
+        }
+    ],
+
+    events: {
+        LOAD: (outcome) => {
+            console.log('Form ready', outcome);
+        },
+        CHANGE: (target, outcome) => {
+            console.log(target.sifaRef, '→', outcome.answers[target.sifaRef]);
+        }
+    }
+});
+
+document.getElementById('save-btn').addEventListener('click', async () => {
+    const result = await SIFA.onSaveEvent(['answers', 'validation']);
+    const hasErrors = Object.values(result.validation).some(v => v.outcome === true);
+    if (hasErrors) {
+        console.warn('Validation failed', result.validation);
+    } else {
+        console.log('Submitting', result.answers);
+    }
+});
+</script>
+</body>
+</html>

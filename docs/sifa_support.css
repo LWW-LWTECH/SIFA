@@ -1,0 +1,748 @@
+/* =============================================================================
+   SIFA — Marked.js Markdown Renderer Stylesheet
+   Target: All elements rendered inside #md by marked.js
+   ============================================================================= */
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES
+   ============================================================================= */
+:root {
+    --md-font-body:       Arial, Helvetica, sans-serif;
+    --md-font-heading:    'Segoe UI', system-ui, -apple-system, sans-serif;
+    --md-font-mono:       'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+
+    --md-color-text:      #1a1d23;
+    --md-color-muted:     #6b7280;
+    --md-color-heading:   #0f1117;
+    --md-color-link:      #2563eb;
+    --md-color-link-hover:#1d4ed8;
+    --md-color-border:    #e5e7eb;
+    --md-color-bg:        #ffffff;
+    --md-color-surface:   #f8f9fa;
+    --md-color-code-bg:   #f3f4f6;
+    --md-color-code-text: #c0392b;
+    --md-color-mark:      #fef08a;
+    --md-color-quote-bar: #2563eb;
+    --md-color-quote-bg:  #eff6ff;
+    --md-color-quote-text:#374151;
+    --md-color-hr:        #d1d5db;
+    --md-color-table-head:#f1f5f9;
+    --md-color-table-alt: #f8fafc;
+
+    --md-radius:          6px;
+    --md-radius-sm:       4px;
+
+    --md-space-xs:        0.25rem;
+    --md-space-sm:        0.5rem;
+    --md-space-md:        1rem;
+    --md-space-lg:        1.5rem;
+    --md-space-xl:        2rem;
+    --md-space-2xl:       2.5rem;
+
+    --md-font-size-base:  1rem;
+    --md-line-height:     1.75;
+    --md-max-width:       100ch;
+}
+
+
+/* =============================================================================
+   CONTAINER
+   ============================================================================= */
+#md {
+    font-family:    var(--md-font-body);
+    font-size:      var(--md-font-size-base);
+    line-height:    var(--md-line-height);
+    color:          var(--md-color-text);
+    background:     var(--md-color-bg);
+    max-width:      var(--md-max-width);
+    margin:         0 auto;
+    padding:        var(--md-space-xl);
+    word-break:     break-word;
+    overflow-wrap:  break-word;
+}
+
+/* First child gets no top margin — no double spacing at the top */
+#md > *:first-child {
+    margin-top: 0;
+}
+
+/* Last child gets no bottom margin */
+#md > *:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =============================================================================
+   HEADINGS  (h1 – h6)
+   marked.js renders: <h1>, <h2>, <h3>, <h4>, <h5>, <h6>
+   ============================================================================= */
+#md h1,
+#md h2,
+#md h3,
+#md h4,
+#md h5,
+#md h6 {
+    font-family:    var(--md-font-heading);
+    font-weight:    700;
+    color:          var(--md-color-heading);
+    line-height:    1.25;
+    margin-top:     var(--md-space-2xl);
+    margin-bottom:  var(--md-space-sm);
+    scroll-margin-top: 1rem;
+}
+
+#md h1 {
+    font-size:      2.25rem;
+    letter-spacing: -0.025em;
+    margin-top:     0;
+    padding-bottom: var(--md-space-sm);
+    border-bottom:  2px solid var(--md-color-border);
+}
+
+#md h2 {
+    font-size:      1.625rem;
+    letter-spacing: -0.015em;
+    padding-bottom: var(--md-space-xs);
+    border-bottom:  1px solid var(--md-color-border);
+}
+
+#md h3 {
+    font-size:      1.25rem;
+}
+
+#md h4 {
+    font-size:      1.075rem;
+    font-weight:    600;
+}
+
+#md h5 {
+    font-size:      0.95rem;
+    font-weight:    600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color:          var(--md-color-muted);
+}
+
+#md h6 {
+    font-size:      0.875rem;
+    font-weight:    600;
+    color:          var(--md-color-muted);
+}
+
+/* Heading anchors — marked generates id attributes for headings */
+#md h1[id],
+#md h2[id],
+#md h3[id],
+#md h4[id],
+#md h5[id],
+#md h6[id] {
+    position: relative;
+}
+
+
+/* =============================================================================
+   PARAGRAPHS
+   ============================================================================= */
+#md p {
+    margin-top:    0;
+    margin-bottom: var(--md-space-md);
+}
+
+
+/* =============================================================================
+   LINKS  <a href="...">
+   ============================================================================= */
+#md a {
+    color:           var(--md-color-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition:      color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+#md a:hover {
+    color:           var(--md-color-link-hover);
+    text-decoration-thickness: 2px;
+}
+
+#md a:visited {
+    color: #7c3aed;
+}
+
+/* External link indicator */
+#md a[href^="http"]::after,
+#md a[href^="https"]::after {
+    content:      ' ↗';
+    font-size:    0.7em;
+    opacity:      0.6;
+    vertical-align: super;
+}
+
+
+/* =============================================================================
+   STRONG & EMPHASIS
+   marked.js renders: <strong>, <em>, <del> (strikethrough with ~~text~~)
+   ============================================================================= */
+#md strong {
+    font-weight: 700;
+    color:       var(--md-color-heading);
+}
+
+#md em {
+    font-style: italic;
+}
+
+#md del {
+    text-decoration: line-through;
+    color:           var(--md-color-muted);
+    opacity:         0.75;
+}
+
+
+/* =============================================================================
+   INLINE CODE  <code>
+   marked.js wraps backtick text in <code>
+   ============================================================================= */
+#md :not(pre) > code {
+    font-family:      var(--md-font-mono);
+    font-size:        0.875em;
+    background:       var(--md-color-code-bg);
+    color:            var(--md-color-code-text);
+    padding:          0.15em 0.4em;
+    border-radius:    var(--md-radius-sm);
+    border:           1px solid var(--md-color-border);
+    white-space:      nowrap;
+}
+
+
+/* =============================================================================
+   CODE BLOCKS  <pre><code>
+   marked.js renders fenced code blocks as <pre><code class="language-*">
+   ============================================================================= */
+#md pre {
+    font-family:      var(--md-font-mono);
+    font-size:        0.875rem;
+    line-height:      1.6;
+    background:       #1e2130;
+    color:            #cdd6f4;
+    padding:          var(--md-space-lg);
+    border-radius:    var(--md-radius);
+    overflow-x:       auto;
+    margin:           var(--md-space-lg) 0;
+    tab-size:         4;
+    position:         relative;
+}
+
+#md pre code {
+    font-family:  inherit;
+    font-size:    inherit;
+    background:   none;
+    color:        inherit;
+    padding:      0;
+    border:       none;
+    border-radius:0;
+    white-space:  pre;
+}
+
+/* Language label — shown via data-* if you add it, or as a pseudo-element */
+#md pre > code[class*="language-"]::before {
+    content:        attr(class);
+    display:        block;
+    font-size:      0.7rem;
+    color:          #6b7280;
+    margin-bottom:  var(--md-space-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Scrollbar for code blocks */
+#md pre::-webkit-scrollbar {
+    height: 5px;
+}
+#md pre::-webkit-scrollbar-track {
+    background: #2a2e40;
+}
+#md pre::-webkit-scrollbar-thumb {
+    background: #4a5080;
+    border-radius: 3px;
+}
+
+
+/* =============================================================================
+   BLOCKQUOTE  <blockquote>
+   marked.js renders: <blockquote><p>...</p></blockquote>
+   ============================================================================= */
+#md blockquote {
+    margin:        var(--md-space-lg) 0;
+    padding:       var(--md-space-sm) var(--md-space-lg);
+    background:    var(--md-color-quote-bg);
+    border-left:   4px solid var(--md-color-quote-bar);
+    border-radius: 0 var(--md-radius) var(--md-radius) 0;
+    color:         var(--md-color-quote-text);
+    font-style:    italic;
+}
+
+#md blockquote p {
+    margin: 0;
+}
+
+#md blockquote p + p {
+    margin-top: var(--md-space-sm);
+}
+
+/* Nested blockquotes */
+#md blockquote blockquote {
+    margin-top:   var(--md-space-sm);
+    border-color: #93c5fd;
+    background:   #dbeafe;
+}
+
+
+/* =============================================================================
+   HORIZONTAL RULE  <hr>
+   marked.js renders: ---  ***  ___  as <hr>
+   ============================================================================= */
+#md hr {
+    border:        none;
+    border-top:    1px solid var(--md-color-hr);
+    margin:        var(--md-space-2xl) 0;
+    height:        0;
+}
+
+
+/* =============================================================================
+   UNORDERED LISTS  <ul><li>
+   ============================================================================= */
+#md ul {
+    list-style:    disc;
+    margin:        0 0 var(--md-space-md) 0;
+    padding-left:  var(--md-space-xl);
+}
+
+#md ul ul {
+    list-style:    circle;
+    margin-bottom: 0;
+}
+
+#md ul ul ul {
+    list-style:    square;
+}
+
+
+/* =============================================================================
+   ORDERED LISTS  <ol><li>
+   ============================================================================= */
+#md ol {
+    list-style:    decimal;
+    margin:        0 0 var(--md-space-md) 0;
+    padding-left:  var(--md-space-xl);
+}
+
+#md ol ol {
+    list-style:    lower-alpha;
+    margin-bottom: 0;
+}
+
+#md ol ol ol {
+    list-style:    lower-roman;
+}
+
+
+/* =============================================================================
+   LIST ITEMS  <li>
+   ============================================================================= */
+#md li {
+    margin-bottom: var(--md-space-xs);
+    line-height:   var(--md-line-height);
+}
+
+#md li > p {
+    margin-bottom: var(--md-space-xs);
+}
+
+/* Tight lists — no paragraph wrapping */
+#md li + li {
+    margin-top: var(--md-space-xs);
+}
+
+/* Nested list spacing */
+#md li > ul,
+#md li > ol {
+    margin-top:    var(--md-space-xs);
+    margin-bottom: var(--md-space-xs);
+}
+
+
+/* =============================================================================
+   TASK LISTS  <ul class="contains-task-list"><li class="task-list-item">
+   marked.js with GFM enabled renders - [ ] and - [x] as checkbox list items
+   ============================================================================= */
+#md ul.contains-task-list {
+    list-style: none;
+    padding-left: var(--md-space-md);
+}
+
+#md .task-list-item {
+    display:     flex;
+    align-items: flex-start;
+    gap:         var(--md-space-sm);
+}
+
+#md .task-list-item input[type="checkbox"] {
+    margin-top:    0.3em;
+    flex-shrink:   0;
+    width:         1em;
+    height:        1em;
+    accent-color:  var(--md-color-link);
+    cursor:        default;
+    pointer-events: none;
+}
+
+
+/* =============================================================================
+   TABLES  <table><thead><tbody><tr><th><td>
+   marked.js renders GFM pipe tables
+   ============================================================================= */
+#md table {
+    width:           100%;
+    border-collapse: collapse;
+    margin:          var(--md-space-lg) 0;
+    font-size:       0.9375rem;
+    border:          1px solid var(--md-color-border);
+    border-radius:   var(--md-radius);
+    overflow:        hidden;
+}
+
+#md thead {
+    background: var(--md-color-table-head);
+}
+
+#md th {
+    font-family:    var(--md-font-heading);
+    font-weight:    600;
+    font-size:      0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color:          var(--md-color-muted);
+    padding:        var(--md-space-sm) var(--md-space-md);
+    text-align:     left;
+    border-bottom:  2px solid var(--md-color-border);
+    white-space:    nowrap;
+}
+
+#md td {
+    padding:       var(--md-space-sm) var(--md-space-md);
+    border-bottom: 1px solid var(--md-color-border);
+    vertical-align: top;
+}
+
+#md tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Zebra striping */
+#md tbody tr:nth-child(even) {
+    background: var(--md-color-table-alt);
+}
+
+#md tbody tr:hover {
+    background: #f0f4ff;
+}
+
+/* Column alignment — marked.js applies text-align via inline style or class */
+#md th[align="center"],
+#md td[align="center"] {
+    text-align: center;
+}
+
+#md th[align="right"],
+#md td[align="right"] {
+    text-align: right;
+}
+
+
+/* =============================================================================
+   IMAGES  <img>
+   marked.js renders: ![alt](src "title")
+   ============================================================================= */
+#md img {
+    max-width:     100%;
+    height:        auto;
+    display:       block;
+    border-radius: var(--md-radius);
+    margin:        var(--md-space-lg) auto;
+    border:        1px solid var(--md-color-border);
+}
+
+/* Images inside links — no border on linked images */
+#md a > img {
+    border: none;
+    margin: 0;
+}
+
+/* Image with title renders as figure-like block */
+#md img[title] {
+    margin-bottom: var(--md-space-xs);
+}
+
+
+/* =============================================================================
+   DEFINITION LISTS  <dl><dt><dd>
+   Not produced by default marked.js but common extension output
+   ============================================================================= */
+#md dl {
+    margin: 0 0 var(--md-space-md) 0;
+}
+
+#md dt {
+    font-weight:   700;
+    font-family:   var(--md-font-heading);
+    margin-top:    var(--md-space-md);
+    color:         var(--md-color-heading);
+}
+
+#md dd {
+    margin-left:   var(--md-space-xl);
+    margin-bottom: var(--md-space-sm);
+    color:         var(--md-color-muted);
+}
+
+
+/* =============================================================================
+   MARK / HIGHLIGHT  <mark>
+   Some marked extensions render ==highlighted== as <mark>
+   ============================================================================= */
+#md mark {
+    background:    var(--md-color-mark);
+    color:         var(--md-color-text);
+    padding:       0.1em 0.25em;
+    border-radius: var(--md-radius-sm);
+}
+
+
+/* =============================================================================
+   ABBREVIATIONS  <abbr>
+   ============================================================================= */
+#md abbr {
+    text-decoration:       underline dotted;
+    text-underline-offset: 2px;
+    cursor:                help;
+}
+
+
+/* =============================================================================
+   KEYBOARD  <kbd>
+   Some markdown flavours render keyboard shortcuts as <kbd>
+   ============================================================================= */
+#md kbd {
+    font-family:   var(--md-font-mono);
+    font-size:     0.8em;
+    padding:       0.1em 0.45em;
+    background:    var(--md-color-surface);
+    border:        1px solid var(--md-color-border);
+    border-bottom: 2px solid #c1c9d4;
+    border-radius: var(--md-radius-sm);
+    color:         var(--md-color-text);
+    white-space:   nowrap;
+}
+
+
+/* =============================================================================
+   SUPERSCRIPT & SUBSCRIPT  <sup> <sub>
+   ============================================================================= */
+#md sup,
+#md sub {
+    font-size:      0.75em;
+    line-height:    0;
+    position:       relative;
+    vertical-align: baseline;
+}
+
+#md sup { top:    -0.5em; }
+#md sub { bottom: -0.25em; }
+
+
+/* =============================================================================
+   FOOTNOTES  <section class="footnotes"> ... <ol><li id="fn-*">
+   marked.js with pedantic/GFM footnotes enabled
+   ============================================================================= */
+#md .footnotes {
+    margin-top:   var(--md-space-2xl);
+    padding-top:  var(--md-space-md);
+    border-top:   1px solid var(--md-color-border);
+    font-size:    0.875rem;
+    color:        var(--md-color-muted);
+}
+
+#md .footnotes ol {
+    padding-left: var(--md-space-lg);
+}
+
+#md .footnotes li {
+    margin-bottom: var(--md-space-xs);
+}
+
+/* Back-reference link */
+#md .footnotes li a[href^="#fnref"] {
+    text-decoration: none;
+    margin-left:     var(--md-space-xs);
+    opacity:         0.6;
+    font-size:       0.8em;
+}
+
+#md a[href^="#fn"] {
+    vertical-align: super;
+    font-size:      0.7em;
+    text-decoration:none;
+}
+
+
+/* =============================================================================
+   DETAILS / SUMMARY
+   Not standard marked output but common in extended markdown
+   ============================================================================= */
+#md details {
+    margin:        var(--md-space-md) 0;
+    border:        1px solid var(--md-color-border);
+    border-radius: var(--md-radius);
+    padding:       var(--md-space-sm) var(--md-space-md);
+    background:    var(--md-color-surface);
+}
+
+#md summary {
+    font-weight:  600;
+    cursor:       pointer;
+    user-select:  none;
+    font-family:  var(--md-font-heading);
+    padding:      var(--md-space-xs) 0;
+    color:        var(--md-color-heading);
+}
+
+#md details[open] > summary {
+    margin-bottom: var(--md-space-sm);
+    border-bottom: 1px solid var(--md-color-border);
+    padding-bottom: var(--md-space-sm);
+}
+
+#md details > *:not(summary):last-child {
+    margin-bottom: 0;
+}
+
+
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
+@media print {
+    #md {
+        max-width:  100%;
+        padding:    0;
+        font-size:  11pt;
+        color:      #000;
+        background: #fff;
+    }
+
+    #md a {
+        color:           #000;
+        text-decoration: underline;
+    }
+
+    #md a[href^="http"]::after,
+    #md a[href^="https"]::after {
+        content: ' (' attr(href) ')';
+        font-size: 0.8em;
+    }
+
+    #md pre,
+    #md blockquote {
+        page-break-inside: avoid;
+    }
+
+    #md h1,
+    #md h2,
+    #md h3 {
+        page-break-after: avoid;
+    }
+
+    #md table {
+        page-break-inside: avoid;
+    }
+
+    #md pre {
+        background: #f3f4f6;
+        color:      #1a1d23;
+        border:     1px solid #e5e7eb;
+    }
+}
+
+
+/* =============================================================================
+   RESPONSIVE
+   ============================================================================= */
+@media (max-width: 640px) {
+    #md {
+        padding:   var(--md-space-md);
+        font-size: 0.9375rem;
+    }
+
+    #md h1 { font-size: 1.75rem; }
+    #md h2 { font-size: 1.375rem; }
+    #md h3 { font-size: 1.125rem; }
+
+    #md pre {
+        padding:   var(--md-space-md);
+        font-size: 0.8125rem;
+    }
+
+    /* Horizontally scrollable tables on mobile */
+    #md table {
+        display:    block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+
+/* =============================================================================
+   DARK MODE  (prefers-color-scheme)
+   ============================================================================= */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --md-color-text:      #e2e8f0;
+        --md-color-muted:     #94a3b8;
+        --md-color-heading:   #f1f5f9;
+        --md-color-link:      #60a5fa;
+        --md-color-link-hover:#93c5fd;
+        --md-color-border:    #2d3748;
+        --md-color-bg:        #0f1117;
+        --md-color-surface:   #1a1d27;
+        --md-color-code-bg:   #1e2130;
+        --md-color-code-text: #f87171;
+        --md-color-mark:      #78350f;
+        --md-color-quote-bar: #3b82f6;
+        --md-color-quote-bg:  #1e293b;
+        --md-color-quote-text:#cbd5e1;
+        --md-color-hr:        #2d3748;
+        --md-color-table-head:#1e2533;
+        --md-color-table-alt: #161b27;
+    }
+
+    #md tbody tr:hover {
+        background: #1e2a40;
+    }
+
+    #md a:visited {
+        color: #a78bfa;
+    }
+
+    #md img {
+        border-color: #2d3748;
+        opacity:      0.92;
+    }
+
+    #md kbd {
+        background:    #1e2130;
+        border-color:  #374151;
+        border-bottom-color: #4b5563;
+        color:         #e2e8f0;
+    }
+}

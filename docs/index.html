@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIFA | Support</title>
+    <link href="./sifa_support.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+
+    <style>
+        body{
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            background:     var(--md-color-bg);
+            color:          var(--md-color-text);
+        }
+        .menu{
+            position: fixed;
+            background:     var(--md-color-bg);
+            border-right: 1px solid var(--md-color-border);
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 200px;
+            box-sizing: border-box;
+            overflow: auto;
+            font-size: 12px;
+        }
+        .menuhead{
+            display: block;
+            padding: 7px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--md-color-border);
+        }
+        .menu li{
+            cursor: pointer;
+        }
+        .menu li a{
+            color: var(--md-color-text);
+            text-decoration: none;
+            display: block;
+            padding: 4px 8px;
+        }
+        .menu li a:hover{
+            opacity: 0.5;
+        }
+        .content{
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            left: 200px;
+            box-sizing: border-box;
+            padding: 8px 16px ;
+            overflow: auto;
+            font-size: 13px;
+            scroll-behavior: smooth;
+        }
+
+        @media print {
+            body{
+                overflow: visible;
+            }
+            .menu{
+                display: none;
+            }
+            .content{
+                position: static;
+                width: 100%;
+                padding: 0;
+                overflow: visible;
+            }
+        }
+    </style>
+</head>
+<body class="sifa-docs">
+    <div class="menu">
+        <div class="menuhead">SIFA Docs</div>
+        <div class="menucontent"></div>
+    </div>
+    <div class="content">
+        <div id="md"></div>
+    </div>
+
+    <script type="module" async>
+        // Get page properties from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageProps = {};
+        for (const [key, value] of urlParams.entries()) {
+            pageProps[key] = value;
+        }
+
+        let md = await fetch(`./sifa_support.md`).then(response => response.text());
+        document.getElementById('md').innerHTML = marked.parse(md);
+
+        let sifa_icon = document.querySelectorAll('.iconcell');
+        for(let i=0; i<sifa_icon.length; i++){
+            sifa_icon[i].addEventListener('click', (e)=>{
+                const iconTitle = e.target.title;
+                console.log(iconTitle);
+                iconTitle ? navigator.clipboard.writeText(iconTitle) : null;
+            });
+        }
+
+        // table of content
+        let leftmenu = document.querySelector('.menucontent');
+        let headers = document.getElementById('md').querySelectorAll('h2');
+
+
+        let listbox = document.createElement('div');
+        leftmenu.appendChild(listbox);
+
+        const scrollContainer = document.querySelector('.content');
+
+        function smoothScrollTo(element, target, duration) {
+            const start = element.scrollTop;
+            const distance = target - start;
+            const startTime = performance.now();
+            function animation(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                element.scrollTop = start + distance;
+                if (progress < 1) { requestAnimationFrame(animation); }
+            }
+            requestAnimationFrame(animation);
+        }
+
+        for(let h=0; h<headers.length; h++){
+            let tock = headers[h].innerText.replace(/ /g, '').replace('/', '').replace('|', '').toLowerCase();
+            headers[h].setAttribute('id', tock);
+            let tocel = document.createElement('li'); 
+            let lnk = document.createElement('a'); 
+            tocel.append(lnk);
+            lnk.innerHTML = headers[h].innerText;
+            lnk.dataset.href = `#${tock}`;
+            lnk.addEventListener('click', (e)=>{
+                e.preventDefault();
+                const targetId = e.target.dataset.href;
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    const containerRect = scrollContainer.getBoundingClientRect();
+                    const targetRect = targetSection.getBoundingClientRect();
+                    const scrollTop = scrollContainer.scrollTop;
+                    const targetPosition = targetRect.top - containerRect.top + scrollTop;
+                    smoothScrollTo(scrollContainer, targetPosition, 800);
+                }
+            });
+            listbox.appendChild(tocel);
+        }
+    </script>
+</body>
+</html>

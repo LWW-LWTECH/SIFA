@@ -108,6 +108,7 @@ export class SifaEngine {
         SIFA.settings = {
             targetElement: 'sifa-input',
             targetGroup:   'sifa-group',
+            targetValidation: null,
             revID:         run_rev,
             debug:         false,
             events:        {},
@@ -292,36 +293,50 @@ export class SifaEngine {
         }
     }
 
-    async runRule(rule){
-        if(SIFA.engine.state === false){ return; }
-        if (!rule.enable) return;
+    runRule(rule){
+        if(SIFA.engine.state === false){ return false; }
+        if (!rule.enable) return false;
 
-        if (await SIFA.evaluateAction(SIFA.prefixFuncs(rule.active)) == false) return;
-        const outcome = await SIFA.evaluateAction(SIFA.prefixFuncs(rule.condition));
+        if (SIFA.evaluateAction(SIFA.prefixFuncs(rule.active)) == false) return false;
+        const outcome = SIFA.evaluateAction(SIFA.prefixFuncs(rule.condition));
         const actions = outcome ? rule.true_actions : rule.false_actions;
 
         if (actions?.length) {
             for (const act of actions) {
-                if(SIFA.engine.state === false){ console.warn('SIFA action processing returned false, stopping further actions.'); return false; }
-                let processed = await SIFA.evaluateAction(SIFA.prefixFuncs(act));
-                if(processed === false){ console.warn('SIFA action processing returned false, stopping further actions.'); return false; }
+                if(SIFA.engine.state === false){ console.warn('SIFA engine state processing returned false, stopping further actions.'); return false; }
+                try{
+                    SIFA.evaluateAction(SIFA.prefixFuncs(act));
+                }catch(e){
+                    console.log(e);
+                    return false;
+                }
             }
         }
     }
 
     // Process Validations
     async processValidations(){
+        // Clear previous validation outcomes
+            SIFA.outcome.validation = {};
         // Check validation settings exists, if not stop running.
             if (!SIFA.validationRules) { return; }
         // Run Validations
             for (const v of SIFA.validationRules) {
                 if (!v.enable) continue;
                 let cond = SIFA.prefixFuncs(v.condition);
-                const outcome = SIFA.evaluateAction(cond).then(res => {
-                    if (res === true  && v.true_message)  SIFA.outcome.validation[v.ref] = { outcome: true,  message: v.true_message  };
-                    if (res === false && v.false_message)  SIFA.outcome.validation[v.ref] = { outcome: false, message: v.false_message };
-                });
+                let res = SIFA.evaluateAction(cond);
+                if (res === true  && v.true_message)  SIFA.outcome.validation[v.ref] = { outcome: true,  message: v.true_message  };
+                if (res === false && v.false_message)  SIFA.outcome.validation[v.ref] = { outcome: false, message: v.false_message };
             }
+        // Display validation messages
+        if(SIFA.settings.targetValidation!=null){
+            let ele = document.querySelector(SIFA.settings.targetValidation);
+            if(!ele){ console.warn(`The target validation ${SIFA.settings.targetValidation} could not find a element.`); return; }
+            ele.innerHTML = '';
+            for(let vkey in SIFA.outcome.validation){
+                SIFA.genhtml({type:'p', attr:{class:'sifa-validation-message'}, html:SIFA.outcome.validation[vkey].message, parent:ele});
+            }
+        }
     }
 
     async calculateUnitCost(){
@@ -350,8 +365,7 @@ export class SifaEngine {
             }
         }
     }
-
-    async evaluateAction(action){
+    evaluateAction(action){
         let func = SIFA.actions;
         let data = eval(action);
         return data?.outcome === true || data?.outcome === false ? data.outcome : data;
@@ -371,5 +385,71 @@ export class SifaEngine {
         let con = str.replace(/\b(sifa|cust)_/g, 'func.$1_');
         if(con.includes('func.func.')){ con = con.replace(/func\.func\./g, 'func.'); }
         return con;
+    }
+    genhtml(set){
+        if(!set.type){ console.error('Type is required for genhtml function.', ['div', 'span', 'p', 'a', 'button']); return null; }
+        // SVG namespace support
+        const SVG_TAGS = new Set(['svg','path','circle','rect','line','polyline','polygon','ellipse','text','g','defs','use','symbol','clipPath','marker']);
+        const el = SVG_TAGS.has(set.type)
+            ? document.createElementNS('http://www.w3.org/2000/svg', set.type)
+            : document.createElement(set.type);
+        // Reference key on the element itself
+        const ref = set.ref ?? set.key;
+        if (ref) el.veloref = ref;
+        // Set ID
+        if(set.id){ el.id = set.id; }
+        // Set attributes
+        const att = set.att ?? set.attr ?? set.attributes; att ? setAttributes(el, att) : null;
+        // Set Data Attributes
+        const data = set.data ?? set.dataset; data ? setDataset(el, data) : null;
+        // Set Additional Properties
+        const odata = set.odata ?? set.props; odata ? setOdata(el, odata) : null;
+        // Set Tooltip
+        set.tooltip ? el.setAttribute('title', set.tooltip) : null;
+        set.disabled ? el.disabled = true : null;
+        set.hidden ? el.hidden = true : null;
+        // Set Inner HTML
+        const html = set.html ?? set.innerHTML;
+        const text = set.text ?? set.innerText;
+        html ? setHTML(el, html) : text ? setText(el, text) : null;
+        // Set Classes
+        const cls = set.cls ?? set.class ?? set.classes ?? set.className; cls ? setClasses(el, cls) : null;
+        // Set Style
+        const style = set.style ?? set.css; style ? setStyle(el, style) : null;
+        // Set Events
+        const events = set.events ?? set.ev; events ? setEvents(el, events) : null;
+        // Set Children
+        if(set.children){
+            for (const child of set.children) {
+                const childEl = genhtml({ ...child, parent: el });
+                const childRef = child.ref ?? child.key;
+                if (childRef) el[childRef] = childEl;
+            }
+        }
+        // set Aria attributes
+        const aria = set.aria; if(aria){ for(const [k, v] of Object.entries(aria)){ el.setAttribute('aria-' + k, v); } }
+        // Set Parent
+        const target = set.parent ?? set.target;
+        if(target){ 
+            const parentEl = typeof target === 'string' ? document.querySelector(target) : target;
+            if (parentEl) {
+                if (set.prepend)         parentEl.prepend(el);
+                else if (set.before)     set.before.before(el);
+                else if (set.after)      set.after.after(el);
+                else                     parentEl.appendChild(el);
+                if (ref) parentEl[ref] = el;
+            }else{
+                console.error('Parent element not found for genhtml function.', target);
+            }
+        }
+        function setAttributes(el, attributes){ for (const [k, v] of Object.entries(attributes)) { el.setAttribute(k, v); } }
+        function setDataset(el, dataset){ for(let dataAttr in dataset){ el.dataset[dataAttr] = dataset[dataAttr]; }}
+        function setHTML(el, html){  Array.isArray(html) ? html.forEach(n => el.appendChild(n)) : html instanceof Node ? el.appendChild(html) : el.innerHTML = html; }
+        function setText(el, text){ el.textContent = text; }
+        function setClasses(el, classes){ if(Array.isArray(classes)){ el.classList.add(...classes); }else if(typeof classes === 'object'){ for(const [key, value] of Object.entries(classes)){ if(value) el.classList.add(key); else el.classList.remove(key); } }else{ el.className = classes; } }
+        function setEvents(el, events) { for (const [evt, value] of Object.entries(events)) { typeof value === 'function' ? el.addEventListener(evt, value) : value?.handler ? el.addEventListener(evt, value.handler, value.options || false) : null; } }
+        function setStyle(el, style) { typeof style === 'string' ? el.style.cssText = style : style instanceof Object ? Object.entries(style).forEach(([k, v]) => k.startsWith('--') ? el.style.setProperty(k, v) : el.style[k] = v) : null; }
+        function setOdata(el, odata){ for(let prop in odata){ el[prop] = odata[prop]; } }
+        return el;
     }
 }

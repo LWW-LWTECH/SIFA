@@ -492,17 +492,18 @@ Actions are called as strings inside `true_actions`, `false_actions`, and `condi
 ---
 
 #### `sifa_hideElement(ref)`
-Hides an element by setting `display: none`. The previous display value is saved internally so `showElement` can restore it.
+Hides an element by setting `display: none`. The function returns `true` if successful and `false` if there are any errors.
 
 ```javascript
 'sifa_hideElement("ele_address_field")'
 'sifa_hideElement("group_payment_section")'
 ```
 
+
 ---
 
 #### `sifa_showElement(ref)`
-Shows a previously hidden element, restoring its original display value. Falls back to `block` if the original was not recorded.
+Shows a previously hidden element, restoring its original display value. The function returns `true` if successful and `false` if there are any errors.
 
 ```javascript
 'sifa_showElement("ele_address_field")'

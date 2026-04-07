@@ -52,7 +52,7 @@
  * USAGE
  * -----------------------------------------------------------------------------
  *   const engine = new SifaEngine({
- *       targetElement: 'my-field-class',
+ *       targetInput: 'my-field-class',
  *       targetGroup:   'my-group-class',
  *       debug:         true,
  *       rules:         [ ...ruleObjects ],
@@ -106,8 +106,9 @@ export class SifaEngine {
     setSettings(set={}){
         const {  validationRules = [], variables = {}, answers = {}, rules = [], ...rest } = set;
         SIFA.settings = {
-            targetElement: 'sifa-input',
-            targetGroup:   'sifa-group',
+            targetInput: '.sifa-input',
+            targetGroup:   '.sifa-group',
+            targetElement: '.sifa-element',
             targetValidation: null,
             revID:         run_rev,
             debug:         false,
@@ -145,16 +146,20 @@ export class SifaEngine {
         const registerInput = (el, input, index) => {
             const key = `field_${slugify(input.name || input.id || index)}`;
             if (input.type === 'radio' || input.type === 'checkbox') {
-                input.sifaRef = `${key}_${input.value}`;
+                input.sifaRef = `${input.value}`;
+                input.sifaPRef = `${key}`;
                 (SIFA.elements[key] ??= {})[input.value] = input;
+                SIFA.outcome.answers[key] = null;
                 // return;
             }else if(input.tagName.toUpperCase() === 'SELECT') {
                 input.sifaRef = key;
                 input.baseOptions = [...input.options].map(o => ({ value: o.value, text: o.text }));
                 SIFA.elements[key] = input;
+                SIFA.outcome.answers[key] = null;
             }else{
                 input.sifaRef = key;
                 SIFA.elements[key] = input;
+                SIFA.outcome.answers[key] = null;
             }
         };
 
@@ -166,6 +171,12 @@ export class SifaEngine {
 
         const registerButton = (el, index) => {
             const key = `button_${slugify(el.id || el.name || index)}`;
+            el.sifaRef = key;
+            SIFA.elements[key] = el;
+        }
+
+        const registerElement = (el, index) => {
+            const key = `ele_${slugify(el.id || el.dataset.tag || index)}`;
             el.sifaRef = key;
             SIFA.elements[key] = el;
         }
@@ -187,7 +198,7 @@ export class SifaEngine {
         };
 
         // Scan target class elements
-        scanElements(`.${SIFA.settings.targetElement}`, 'ele', (el, index) => {
+        scanElements(`${SIFA.settings.targetInput}`, 'ele', (el, index) => {
             // attachListeners(el);
             el.querySelectorAll('input, select, textarea').forEach(input => {
                 registerInput(el, input, index);
@@ -202,15 +213,14 @@ export class SifaEngine {
             });
         });
 
+        scanElements(`${SIFA.settings.targetElement}`, 'ele', (el, index) => {
+            registerElement(el, index);
+        });
+
         // Scan group elements
-        const defaultGroupSelectors = ['details', 'section', 'fieldset', 'article'];
-        const existingSelectors = SIFA.settings.targetGroup.split(',').map(s => s.trim());
-        // Append only selectors not already present
-        const mergedSelectors = [
-            ...existingSelectors,
-            ...defaultGroupSelectors.filter(s => !existingSelectors.includes(s))
-        ].join(', ');
-        scanElements(mergedSelectors, 'group');
+        // const defaultGroupSelectors = ['details', 'section', 'fieldset', 'article'];
+        const existingSelectors = SIFA.settings.targetGroup;
+        scanElements(existingSelectors, 'group');
     }
 
     async onLoadEvent(){
@@ -231,12 +241,13 @@ export class SifaEngine {
     async onChangeEvent(target){
         SIFA.outcome.logs = []; // clear logs on each action processing
         SIFA.triggerInput = target;
-        const baseKey = target.type === 'checkbox' || target.type === 'radio'
-            ? target.sifaRef.replace(/_[^_]+$/, '')  // strip _value suffix
-            : target.sifaRef;
-        const value = target.type === 'checkbox'
+        const baseKey = target.type === 'checkbox' || target.type === 'radio' ? target.sifaPRef : target.sifaRef;
+        const valKey  = target.type === 'checkbox' || target.type === 'radio' ? target.sifaRef : null;
+
+        const value = target.type === 'checkbox' || target.type === 'radio'
             ? Object.values(SIFA.elements[baseKey]).filter(i => i.checked).map(i => i.value)
             : target.value;
+
         SIFA.actions.sifa_setAnswers({ [baseKey]: value });
         await SIFA.processActions('CHANGE');
         await SIFA.processValidations();
@@ -285,7 +296,7 @@ export class SifaEngine {
                 rules = rules.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0)); // sort rules by priority property
                 for (const rule of rules) {
                     let step = await this.runRule(rule);
-                    if(step === false){ console.warn('SIFA rule processing returned false, stopping further rules.'); return ''; }
+                    // if(step === false){ console.warn('SIFA rule processing returned false, stopping further rules.'); return ''; }
                 }
             }else{
                 return '';

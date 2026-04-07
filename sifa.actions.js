@@ -112,7 +112,11 @@ export function setElementText(ref, text){
         let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, text:text});
         let ele = sifa_checkElementExists(inputs.ref);
         if(ele){
-            ele.textContent = inputs.text;
+            if(hasHTML(inputs.text)){
+                ele.innerHTML = inputs.text;
+            }else{
+                ele.textContent = inputs.text;
+            }
             return true;
         }else{ return false; }
     }catch(e){
@@ -162,7 +166,7 @@ export function setValue(ref, value){
 }
 export function getValue(ref){
     let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref});
-    if(!SIFA.outcome.answers[inputs.ref]){ console.warn(`getAnswer: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return null; }
+    if(SIFA.outcome.answers[inputs.ref] === undefined){ console.warn(`getAnswer: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return null; }
     return SIFA.outcome.answers[inputs.ref];
 }
 export function clearValue(ref){
@@ -532,7 +536,7 @@ export function clearAnswers(){
 export function answerEquals(ref, value){
     let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, value:value});
     let ans = SIFA.outcome.answers[inputs.ref] ? SIFA.outcome.answers[inputs.ref] : null;
-    if(ans === null){ console.warn(`checkAnswer: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return; }
+    if(ans === undefined){ console.warn(`answerEquals: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return; }
     if(Array.isArray(ans)){
         return ans.some(a => a == inputs.value);
     }else{
@@ -541,13 +545,23 @@ export function answerEquals(ref, value){
 }
 export function answerContains(ref, value){
     let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, value:value});
-    let ans = SIFA.outcome.answers[inputs.ref] ? SIFA.outcome.answers[inputs.ref] : null;
-    if(ans === null){ console.warn(`checkAnswer: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return; }
+    if(SIFA.outcome.answers[inputs.ref] === undefined){ console.warn(`answerContains: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return false; }
+
+    let ans = SIFA.outcome.answers[inputs.ref];
+    if(ans === null || ans === undefined){ return false; }
+
     if(Array.isArray(ans)){
         return ans.some(a => a.includes(inputs.value));
     }else{
         return ans.includes(inputs.value);
     }
+}
+export function answerNotEmpty(ref){
+    let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref});
+    let ans = SIFA.outcome.answers[inputs.ref] ? SIFA.outcome.answers[inputs.ref] : null;
+    if(ans === undefined){ console.warn(`answerNotEmpty: Reference "${inputs.ref}" not found in SIFA.outcome.answers.`); return; }
+    if(ans === null || ans === undefined){ return false; }
+    return true;
 }
 
 
@@ -600,6 +614,65 @@ export function isNumber(value){
 export function length(value){
     let inputs = sifa_checkIfNestedOutcomeMulti({value:value});
     return inputs.value ? inputs.value.length : null;
+}
+export function upperCase(value){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value:value});
+    if(!inputs.value){ return undefined; }
+    if(Array.isArray(inputs.value)){
+        return inputs.value.map(v => v.toUpperCase());
+    }else{
+        return String(inputs.value).toUpperCase();
+    }
+}
+export function lowerCase(value){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value:value});
+    if(!inputs.value){ return undefined; }
+    if(Array.isArray(inputs.value)){
+        return inputs.value.map(v => v.toLowerCase());
+    }else{
+        return String(inputs.value).toLowerCase();
+    }
+}
+export function upperLowerCase(value){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value:value});
+    if(!inputs.value){ return undefined; }
+    if(Array.isArray(inputs.value)){
+        return inputs.value.map(v => {
+            let str = String(v);
+            return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        });
+    }else{
+        let str = String(inputs.value);
+        return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    }
+}
+export function addition(value1, value2){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value1:value1, value2:value2});
+    let num1 = Number(inputs.value1);
+    let num2 = Number(inputs.value2);
+    if(isNaN(num1) || isNaN(num2)){ return null; }
+    return num1 + num2;
+}
+export function subtraction(value1, value2){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value1:value1, value2:value2});
+    let num1 = Number(inputs.value1);
+    let num2 = Number(inputs.value2);
+    if(isNaN(num1) || isNaN(num2)){ return null; }
+    return num1 - num2;
+}
+export function multiplication(value1, value2){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value1:value1, value2:value2});
+    let num1 = Number(inputs.value1);
+    let num2 = Number(inputs.value2);
+    if(isNaN(num1) || isNaN(num2)){ return null; }
+    return num1 * num2;
+}
+export function division(value1, value2){
+    let inputs = sifa_checkIfNestedOutcomeMulti({value1:value1, value2:value2});
+    let num1 = Number(inputs.value1);
+    let num2 = Number(inputs.value2);
+    if(isNaN(num1) || isNaN(num2) || num2 === 0){ return null; }
+    return num1 / num2;
 }
 
 
@@ -675,6 +748,12 @@ export function costPlusPrice(set){
         break;
     }
 }
+export function getPrice(){
+    return SIFA.outcome.saleprice ? SIFA.outcome.saleprice : 0;
+}
+export function getCost(){
+    return SIFA.outcome.unitcost ? SIFA.outcome.unitcost : 0;
+}
 
 
 /* Utility Functions */
@@ -747,7 +826,9 @@ function outputResult(name, inputs, outcome, error=null){
     addLog(name, valobj);
     return valobj;
 }
-
+function hasHTML(str) {
+    return /<[a-z][\s\S]*>/i.test(str);
+}
 /*
 // Local Storage
 export function setLocalStorage(key, value){

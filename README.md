@@ -16,6 +16,10 @@ Instead of writing `document.getElementById` and event listeners for every field
 Field changes → Event fires → Rules evaluate → Actions run → Validations update → Your callback receives outcome
 ```
 
+## Demos
+
+[Pizza Builder](https://lwinter.tech/devproj/sifa/demos/pizza.html)
+
 ---
 
 ## Features

@@ -52,6 +52,8 @@ All three files must live in the same directory. The engine uses ES module dynam
 
 ## Quick Start
 
+[Documentation](https://localhost:441/devproj/sifa/docs/)
+
 ### 1. Mark up your HTML
 
 Wrap each field in a container element with the class `sifa-input`. Use `sifa-group` (or semantic elements like `<section>`, `<fieldset>`) for collapsible areas.

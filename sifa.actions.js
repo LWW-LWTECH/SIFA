@@ -94,6 +94,19 @@ export function setAttribute(ref, attr, value){
         return false;
     }
 }
+export function setElementStyle(ref, styleProp, value){
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, styleProp:styleProp, value:value});
+        let ele = sifa_checkElementExists(inputs.ref);
+        if(ele){
+            ele.style[inputs.styleProp] = inputs.value;
+            return true;
+        }else{ return false; }
+    }catch(e){
+        console.warn(e);        return false;
+    }
+}   
+
 export function removeAttribute(ref, attr){
     try{
         let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, attr:attr});

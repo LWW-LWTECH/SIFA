@@ -213,14 +213,21 @@ export class SifaEngine {
             });
         });
 
+        /*
         scanElements(`${SIFA.settings.targetElement}`, 'ele', (el, index) => {
             registerElement(el, index);
         });
+        */
 
         // Scan group elements
         // const defaultGroupSelectors = ['details', 'section', 'fieldset', 'article'];
-        const existingSelectors = SIFA.settings.targetGroup;
-        scanElements(existingSelectors, 'group');
+        scanElements(SIFA.settings.targetGroup, 'group', (el, index) => {
+            // lookup buttons
+            el.querySelectorAll('button').forEach(button => {
+                registerButton(button, index);
+                button.addEventListener('click', e => SIFA.onClickEvent(e.target));
+            });
+        });
     }
 
     async onLoadEvent(){
@@ -314,6 +321,7 @@ export class SifaEngine {
 
         if (actions?.length) {
             for (const act of actions) {
+                
                 if(SIFA.engine.state === false){ console.warn('SIFA engine state processing returned false, stopping further actions.'); return false; }
                 try{
                     SIFA.evaluateAction(SIFA.prefixFuncs(act));

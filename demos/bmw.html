@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIFA | BMW Demo</title>
+
+    <style>
+        @font-face {
+            font-display: swap;
+            font-family: "bmwTypeNextWeb";
+            font-weight: 300;
+            src: url(./bmw_resources/BMWTypeNext-Regular.woff2) format("woff2");
+        }
+        * {
+            font-family: "bmwTypeNextWeb" !important;
+        }
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        strong{
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #000;
+        }
+        .cpq_window{
+            display: block;
+            position: fixed;
+            background-color: white;
+            width: 100%;
+            height: 100%;
+        }
+        .pagination{
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            justify-content: center;
+            padding: 16px 16px 0px 16px;
+        }
+        .pagination button{
+            padding: 12px 8px 16px 8px;
+            text-decoration: none;
+            color: #666;
+            transition: color .2s ease-in-out;
+            white-space: nowrap;
+            background-color: transparent;
+            border:none;
+            border-bottom: 4px solid transparent;
+            font-size: 17px;
+        }
+        .pagination .activebutton{
+            color: #000;
+            border-bottom: 4px solid #000;
+        }
+
+        .cpqblock{
+            width: 100%;
+            height: calc(100% - 84px);
+            background-image: url(./bmw_resources/cosysec_sport.webp);
+            background-position: top left;
+            background-size: cover;
+            position: relative;
+            transition: 0.3s ease-in-out;
+        }
+        #option_block{
+            position: absolute;
+            box-sizing: border-box;
+            overflow: hidden;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 0 1px #00000047, 0 2px 8px #00000014;
+            width: 380px;
+            margin: auto;
+            right: 5%;
+            bottom: 4%;
+            top: 6%;
+        }
+        #option_block h2{
+            padding: 0 6%;
+            font-weight: lighter;
+            color: #666;
+            font-size: 1.2em;
+        }
+        .option_nav_button{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1c69d3;
+            color: white;
+            font-weight: 400;
+            width: 100%;
+            padding: 5% 7%;
+            margin: 0;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1em;
+            transition: 0.3s ease-in-out;
+        }
+        .option_nav_button:hover{
+            background-color: #1d55a2;
+        }
+        .option_nav_button::after{
+            content: '>';
+            font-size: 1.2em;
+        }
+        .info_option{
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .info_option label{
+            font-size: 12px;
+            font-weight: lighter;
+            color: #666;
+            border: 2px solid #e6e6e6;
+            border-radius: 4px;
+            width: calc(100% - 20px);
+            display: block;
+            margin: auto;
+            box-sizing: border-box;
+            padding: 5%;
+            position: relative;
+            transition: 0.3s ease-in-out;
+        }
+        .info_option label:hover{
+            background-color: hsla(0, 0%, 95%, 0.8);
+        }
+        .info_option input{
+            position: absolute;
+            top: 10px;
+            right: 19px;
+            width: 20px;
+            height: 20px;
+        }
+        .info_option input[type="radio"]:checked + label{
+            border-color: #000;
+        }
+        .option_block_body{
+            padding: 0% 7%;
+            font-weight: lighter;
+            color: #666;
+            font-size: 0.8em;
+        }
+        .option_block_body .sifa-input{
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .option_block_body label{
+            cursor: pointer;
+            width: 100%;
+            padding: 3%;
+        }
+        .option_block_body label:hover{
+            background-color: hsla(0, 0%, 95%, 0.8);
+        }
+
+
+        .title_block{
+            position: absolute;
+            display: grid;
+            bottom: 9%;
+            left: 5%;
+            grid-template-columns: auto 245px;
+            width: calc(100% - 600px);
+            align-items: end;
+        }
+        .msrp_price{
+            font-size: 2.1875rem;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .wheel_view, .interior_view{
+            position: relative;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-position: center;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            width: calc(100% - 10%);
+            margin: auto;
+            aspect-ratio: 1.7;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid #e1e1e1;
+            margin-top: 16px;
+            transition: 0.7s ease-in-out;
+        }
+        .wheel_view:hover{
+            background-size: 200%;
+            background-position: center;
+        }
+        .interior_view:hover{
+            background-size: 200%;
+            background-position: center bottom;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <section class="cpq_window">
+        <div class="pagination sifa-input">
+            <button class="nav_button activebutton" id="to_info">Welcome</button>
+            <button class="nav_button" id="to_design">Design</button>
+            <button class="nav_button " id="to_color">Color</button>
+            <button class="nav_button " id="to_wheels">Wheels</button>
+            <button class="nav_button " id="to_interior">Interior</button>
+            <button class="nav_button " id="to_summary">Summary</button>
+        </div>
+
+        <div class="cpqblock sifa-group" id="cpqblock">
+
+            <section class="title_block">
+                <div>
+                    <div class="sifa-group" id="title_type" style="font-weight: lighter; font-size: 0.9em; margin-bottom: 4px;"></div>
+                    <div class="sifa-group" id="title_desc" style="font-weight: lighter; font-size: 1.6rem;">Choose your vehicle design.</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                    <div style="font-weight: lighter; font-size: 0.9em;">MSRP as built</div>
+                    <div class="sifa-group msrp_price" id="msrp">$0</div>
+                </div>
+            </section>
+
+            <section id="option_block">
+                <div class="sifa-group" id="welcome" style="display: block;">
+                    <h2>Welcome to BMW Demo</h2>
+                    <p class="option_block_body">This is a demo of SIFA, the SIFA engine was not used on the official BMW site. All images and pricing are loosely related to the content from the original BMW site.</p>
+                    <p class="option_block_body">This demo is for illustrative purposes only.</p>
+                    <p class="option_block_body">This demo shows SIFA being used for pagination & tab navigation. <br/>This demo also stores all the answers and builds the summary and pricing.</p>
+                    <hr style="width:86%;">
+                    <h2>Links</h2>
+                    <p class="option_block_body">
+                        <a href="https://www.bmwusa.com/build-your-own.html#/studio/fuvxunrb/design" target="_blank"><span style="width: 100px; display: inline-block;">Original:</span> BMW Site</a> <br/>
+                        <a href="https://lwinter.tech/devproj/sifa/index.html" target="_blank"><span style="width: 100px; display: inline-block;">JS Class:</span> SIFA Page</a> <br/>
+                        <a href="https://lwinter.tech" target="_blank"><span style="width: 100px; display: inline-block;">Developer:</span> Lee W Winter Site</a>
+                    </p>
+                    <button class="option_nav_button" id="welcome_next">Next: Design </button>
+                </div>
+
+                <div class="sifa-group" id="design">
+                    <h2>Choose your look</h2>
+                    <div class="info_option sifa-input">
+                        <input type="radio" id="sport" name="look" value="sport">
+                        <label for="sport">
+                            <div>Sport</div>
+                            <div>Distinctive design</div>
+                            <div><strong>$0</strong></div>
+                            <hr>
+                            <p>
+                            Includes: <br/>
+                            <ul>
+                                    <li>20" Aero Frozen Dark Grey Wheels</li>
+                                    <li>Titanium Bronze Interior Trim</li>
+                                    <li>Sport Steering Wheel</li>
+                                    <li>Sport Seats</li>
+                                    <li>Driving Assistant with Frontal Collision Mitigation, Active Blind Spot and Lane Keeping Assistant</li>
+                                </ul>
+                            </p>
+                        </label>
+                    </div>
+                    <div class="info_option sifa-input">
+                        <input type="radio" id="msporty" name="look" value="msporty">
+                        <label for="msporty">
+                            <div>M Sport</div>
+                            <div>Motorsport Form</div>
+                            <div><strong>$4,500</strong></div>
+                            <hr>
+                            <p>
+                            Includes: <br/>
+                            <ul>
+                                    <li>21" M Aero Bicolor Wheels</li>
+                                    <li>M Dark Silver Interior Trim</li>
+                                    <li>M steering wheel</li>
+                                    <li>M Multi-Functional Seats</li>
+                                    <li>M Sport Brakes with Blue Calipers</li>
+                                    <li>Driving Assistant with Frontal Collision Mitigation, Active Blind Spot and Lane Keeping Assistant</li>
+                                </ul>
+                            </p>
+                        </label>
+                    </div>
+                    <button class="option_nav_button" id="design_next">Next: Color</button>
+                </div>
+
+                <div class="sifa-group" id="color">
+                    <h2>Choose your color</h2>
+                    <div class="option_block_body">
+                        <div class="sifa-input">
+                            <label for="alpine_color">
+                                <div>Alpine White</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="alpine_color" name="color" value="alpine_color">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="mwhite_color">
+                                <div>Mineral White Metalic</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="mwhite_color" name="color" value="mwhite_color">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="rmblue_color">
+                                <div>Arctic Race Blue metallic</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="rmblue_color" name="color" value="rmblue_color">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="rmred_color">
+                                <div>Aventurin Red Metallic</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="rmred_color" name="color" value="rmred_color">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="rmsilver_color">
+                                <div>Space Silver Metallic</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="rmsilver_color" name="color" value="rmsilver_color">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="stormbay_color">
+                                <div>Storm Bay Metallic</div>
+                                <div><strong>$1,950</strong></div>
+                            </label>
+                            <input type="radio" id="stormbay_color" name="color" value="stormbay_color">
+                        </div>
+                    </div>
+                    <button class="option_nav_button" id="color_next">Next: Wheels</button>
+                </div>
+
+                <div class="sifa-group" id="wheels">
+                    <h2>Choose your wheels</h2>
+                    <div class="option_block_body">
+                        <div class="sifa-input">
+                            <label for="1002_Wheels">
+                                <div>20" Aaro 1002 Wheels</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="1002_Wheels" name="wheels" value="1002_Wheels">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="1012_Wheels">
+                                <div>20" Aaro Bicolor 1012 Wheels</div>
+                                <div><strong>$800</strong></div>
+                            </label>
+                            <input type="radio" id="1012_Wheels" name="wheels" value="1012_Wheels">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="1021_Wheels">
+                                <div>22" Aaro Bicolor 1021 Wheels</div>
+                                <div><strong>$1,800</strong></div>
+                            </label>
+                            <input type="radio" id="1021_Wheels" name="wheels" value="1021_Wheels">
+                        </div>
+                    </div>
+                    <div class="sifa-group wheel_view" id="wheel_view"></div>
+                    <button class="option_nav_button" id="wheels_next">Next: Interior</button>
+                </div>
+
+                <div class="sifa-group" id="interior">
+                    <h2>Choose your interior</h2>
+                    <div class="option_block_body">
+                        <div class="sifa-input">
+                            <label for="int_oyster">
+                                <div>Oyster Interior</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="int_oyster" name="interior" value="int_oyster">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="int_mocha">
+                                <div>Mocha Interior</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="int_mocha" name="interior" value="int_mocha">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="int_black">
+                                <div>Black Interior</div>
+                                <div><strong>$0</strong></div>
+                            </label>
+                            <input type="radio" id="int_black" name="interior" value="int_black">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="int_amido">
+                                <div>Amido Interior</div>
+                                <div><strong>$3,500</strong></div>
+                            </label>
+                            <input type="radio" id="int_amido" name="interior" value="int_amido">
+                        </div>
+                        <div class="sifa-input">
+                            <label for="int_chestnut">
+                                <div>Chestnut Interior</div>
+                                <div><strong>$3,500</strong></div>
+                            </label>
+                            <input type="radio" id="int_chestnut" name="interior" value="int_chestnut">
+                        </div>
+                    </div>
+                    <div class="sifa-group interior_view" id="interior_view"></div>
+                    <button class="option_nav_button" id="interior_next">Next: Summary</button>
+                </div>
+
+                <div class="sifa-group" id="summary"></div>
+            </section>
+        </div>
+    </section>
+
+    <script type="module">
+        const imagePaths = [
+            './bmw_resources/cosysec_sport.webp',
+            './bmw_resources/cosysec_msport.webp',
+            './bmw_resources/cosysec_sport_alpine_color.webp',
+            './bmw_resources/cosysec_sport_mwhite_color.webp',
+            './bmw_resources/cosysec_sport_rmblue_color.webp',
+            './bmw_resources/cosysec_sport_rmred_color.webp',
+            './bmw_resources/cosysec_sport_rmsilver_color.webp',
+            './bmw_resources/cosysec_sport_stormbay_color.webp',
+            './bmw_resources/cosysec_msport_alpine_color.webp',
+            './bmw_resources/cosysec_msport_mwhite_color.webp',
+            './bmw_resources/cosysec_msport_rmblue_color.webp',
+            './bmw_resources/cosysec_msport_rmred_color.webp',
+            './bmw_resources/cosysec_msport_rmsilver_color.webp',
+            './bmw_resources/cosysec_msport_stormbay_color.webp',
+            './bmw_resources/1002_Wheels.webp',
+            './bmw_resources/1012_Wheels.webp',
+            './bmw_resources/1021_Wheels.webp',
+            './bmw_resources/int_oyster.webp',
+            './bmw_resources/int_mocha.webp',
+            './bmw_resources/int_black.webp',
+            './bmw_resources/int_amido.webp',
+            './bmw_resources/int_chestnut.webp'
+        ];
+
+        imagePaths.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        import { SifaEngine } from '../sifa.engine.js';
+        new SifaEngine({
+            debug: true,
+            rules: [
+                {
+                    event: 'LOAD',
+                    enable: true,
+                    rules: [
+                        {
+                            ref: 'initial_state',
+                            enable: true,
+                            priority: 0,
+                            active: 'true',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_setVariable("msrp_price", 81950)',
+                                'sifa_setElementText("group_msrp", "$" + sifa_getVariable("msrp_price").toLocaleString())',
+                                'sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                            ],
+                            false_actions: []
+                        }
+                    ]
+                },
+                {
+                    event: 'CLICK',
+                    enable: true,
+                    rules: [
+                        {
+                            ref: 'navigate_to_info',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("button_to_info")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_welcome"); sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                                'sifa_showElement("group_welcome")'
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'navigate_to_design',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("button_welcome_next") || sifa_triggeredField("button_to_design")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_welcome"); sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                                'sifa_showElement("group_design")',
+                                'sifa_removeClass("button_to_info", "activebutton"); sifa_setClass("button_to_design", "activebutton")'
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'navigate_to_color',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("button_design_next") || sifa_triggeredField("button_to_color")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_welcome"); sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                                'sifa_showElement("group_color")',
+                                'sifa_removeClass("button_to_design", "activebutton"); sifa_setClass("button_to_color", "activebutton")',
+
+                                'sifa_getValue("field_look")=="sport" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_alpine_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_alpine_color.webp)") : null;',
+                                'sifa_setValue("field_color", "alpine_color")'
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'navigate_to_wheels',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("button_color_next") || sifa_triggeredField("button_to_wheels")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_welcome"); sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                                'sifa_showElement("group_wheels")',
+                                'sifa_removeClass("button_to_color", "activebutton"); sifa_setClass("button_to_wheels", "activebutton")'
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'navigate_to_interior',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("button_wheels_next") || sifa_triggeredField("button_to_interior")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_welcome"); sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                                'sifa_showElement("group_interior")',
+                                'sifa_removeClass("button_to_wheels", "activebutton"); sifa_setClass("button_to_interior", "activebutton")',
+                                'sifa_setValue("field_interior", "int_oyster")',
+                                'sifa_getValue("field_interior")=="int_oyster" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_oyster.webp)") : null;',
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'navigate_to_summary',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("button_interior_next") || sifa_triggeredField("button_to_summary")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_welcome"); sifa_hideElement("group_design"); sifa_hideElement("group_color"); sifa_hideElement("group_wheels"); sifa_hideElement("group_interior"); sifa_hideElement("group_summary")',
+                                'sifa_showElement("group_summary")',
+                                'sifa_removeClass("button_to_interior", "activebutton"); sifa_setClass("button_to_summary", "activebutton")'
+                            ],
+                            false_actions: []
+                        },
+                    ]
+                },
+                {
+                    event: 'CHANGE',
+                    enable: true,
+                    rules: [
+                        {
+                            ref: 'initial_state',
+                            enable: true,
+                            priority: 0,
+                            active: 'true',
+                            condition: 'true',
+                            true_actions: [
+                                // Set Titles based on Design Selection
+                                'sifa_getValue("field_look")=="sport" ? sifa_setElementText("group_title_type", "Sport") && sifa_setElementText("group_title_desc", "Highly expressive elements elevate the iX design.") : null;',
+                                'sifa_getValue("field_look")=="msporty" ? sifa_setElementText("group_title_type", "M Sport") && sifa_setElementText("group_title_desc", "Performance features inspired by BMW Motorsport.") : null;',
+                                
+                                // Calculate MSRP Pricing
+                                'sifa_setVariable("msrp_price", 81950)',
+                                'sifa_getValue("field_look")=="msporty" ? sifa_setVariable("msrp_price", sifa_addition(sifa_getVariable("msrp_price"), 4500)) : null;',
+                                'sifa_getValue("field_color")=="stormbay_color" ? sifa_setVariable("msrp_price", sifa_addition(sifa_getVariable("msrp_price"), 1950)) : null;',
+                                'sifa_getValue("field_wheels")=="1012_Wheels" ? sifa_setVariable("msrp_price", sifa_addition(sifa_getVariable("msrp_price"), 800)) : null;',
+                                'sifa_getValue("field_wheels")=="1021_Wheels" ? sifa_setVariable("msrp_price", sifa_addition(sifa_getVariable("msrp_price"), 1800)) : null;',
+                                'sifa_getValue("field_interior")=="int_chestnut" ? sifa_setVariable("msrp_price", sifa_addition(sifa_getVariable("msrp_price"), 3500)) : null;',
+                                'sifa_getValue("field_interior")=="int_amido" ? sifa_setVariable("msrp_price", sifa_addition(sifa_getVariable("msrp_price"), 3500)) : null;',
+                                
+                                // Set MSRP Text
+                                'sifa_setElementText("group_msrp", "$" + sifa_getVariable("msrp_price").toLocaleString())',
+
+                                // Change image based on design selection
+                                'sifa_getValue("field_look")=="sport" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport.webp)") : null;',
+
+                                // sport colors
+                                'sifa_getValue("field_look")=="sport" && sifa_getValue("field_color")=="alpine_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_alpine_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="sport" && sifa_getValue("field_color")=="mwhite_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_mwhite_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="sport" && sifa_getValue("field_color")=="rmblue_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_rmblue_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="sport" && sifa_getValue("field_color")=="rmred_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_rmred_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="sport" && sifa_getValue("field_color")=="rmsilver_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_rmsilver_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="sport" && sifa_getValue("field_color")=="stormbay_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_sport_stormbay_color.webp)") : null;',
+
+                                // msport colors
+                                'sifa_getValue("field_look")=="msporty" && sifa_getValue("field_color")=="alpine_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_alpine_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" && sifa_getValue("field_color")=="mwhite_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_mwhite_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" && sifa_getValue("field_color")=="rmblue_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_rmblue_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" && sifa_getValue("field_color")=="rmred_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_rmred_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" && sifa_getValue("field_color")=="rmsilver_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_rmsilver_color.webp)") : null;',
+                                'sifa_getValue("field_look")=="msporty" && sifa_getValue("field_color")=="stormbay_color" ? sifa_setElementStyle("group_cpqblock", "backgroundImage", "url(./bmw_resources/cosysec_msport_stormbay_color.webp)") : null;',
+
+                                // Wheel Views
+                                'sifa_getValue("field_wheels")=="1002_Wheels" ? sifa_setElementStyle("group_wheel_view", "backgroundImage", "url(./bmw_resources/1002_Wheels.webp)") : null;',
+                                'sifa_getValue("field_wheels")=="1012_Wheels" ? sifa_setElementStyle("group_wheel_view", "backgroundImage", "url(./bmw_resources/1012_Wheels.webp)") : null;',
+                                'sifa_getValue("field_wheels")=="1021_Wheels" ? sifa_setElementStyle("group_wheel_view", "backgroundImage", "url(./bmw_resources/1021_Wheels.webp)") : null;',
+
+                                // Interior Views
+                                'sifa_getValue("field_interior")=="int_oyster" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_oyster.webp)") : null;',
+                                'sifa_getValue("field_interior")=="int_mocha" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_mocha.webp)") : null;',
+                                'sifa_getValue("field_interior")=="int_black" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_black.webp)") : null;',
+                                'sifa_getValue("field_interior")=="int_amido" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_amido.webp)") : null;',
+                                'sifa_getValue("field_interior")=="int_chestnut" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_chestnut.webp)") : null;',
+                            ],
+                            false_actions: []
+                        }
+                    ]
+                }
+            ]
+        });
+
+        let nav_buttons = document.querySelectorAll('.nav_button');
+        nav_buttons.forEach(button => {
+            button.addEventListener('click', (t) => {
+                nav_buttons.forEach(button => {
+                    button.classList.remove('activebutton');
+                });
+                t.target.classList.add('activebutton');
+            });
+        });
+    </script>
+</body>
+</html>

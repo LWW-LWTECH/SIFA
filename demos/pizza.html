@@ -508,12 +508,15 @@ body {
 import { SifaEngine } from '../sifa.engine.js';
 
 new SifaEngine({
+    editMode: true,
     debug: false,
     targetValidation:"#val-contact",
     rules: [
         {
             event: 'LOAD',
             enable: true,
+            priority: 0,
+            desc: 'Hide all sections except size on load',
             rules: [
                 {
                     ref: 'hide_page_group_on_load',
@@ -537,6 +540,8 @@ new SifaEngine({
         {
             event: 'CHANGE',
             enable: true,
+            priority: 0,
+            desc: 'Calculate price and update summary on any change',
             rules: [
                 {
                     ref: 'pizza_price_calculation',
@@ -698,6 +703,9 @@ new SifaEngine({
             ]
         }
     ],
+    variables: {
+        'pizza': 'test'
+    },
     validationRules: [
         {
             ref:'val_size', enable:true,

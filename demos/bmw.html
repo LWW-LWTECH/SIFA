@@ -60,8 +60,11 @@
             background-image: url(./bmw_resources/cosysec_sport.webp);
             background-position: top left;
             background-size: cover;
+            background-repeat: no-repeat;
             position: relative;
             transition: 0.3s ease-in-out;
+            max-width: 2000px;
+            margin: auto;
         }
         #option_block{
             position: absolute;
@@ -170,8 +173,8 @@
             bottom: 9%;
             left: 5%;
             grid-template-columns: auto 245px;
-            width: calc(100% - 600px);
             align-items: end;
+            right: 542px;
         }
         .msrp_price{
             font-size: 2.1875rem;
@@ -204,6 +207,23 @@
         .interior_view:hover{
             background-size: 200%;
             background-position: center bottom;
+        }
+        .sum_link{
+            display: flex;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 16px;
+            flex: 1 0 0;
+            border-radius: 3px;
+            background: #221f1f;
+            border: none;
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color .2s ease;
+            text-decoration: none;
         }
 
     </style>
@@ -414,7 +434,10 @@
                     <button class="option_nav_button" id="interior_next">Next: Summary</button>
                 </div>
 
-                <div class="sifa-group" id="summary"></div>
+                <div class="sifa-group" id="summary">
+                    <h2>Summary</h2>
+                    <div class="sifa-group option_block_body" id="summary_notes"></div>
+                </div>
             </section>
         </div>
     </section>
@@ -452,11 +475,13 @@
 
         import { SifaEngine } from '../sifa.engine.js';
         new SifaEngine({
+            editMode: true,
             debug: true,
             rules: [
                 {
                     event: 'LOAD',
                     enable: true,
+                    priority: 0,
                     rules: [
                         {
                             ref: 'initial_state',
@@ -476,6 +501,7 @@
                 {
                     event: 'CLICK',
                     enable: true,
+                    priority: 0,
                     rules: [
                         {
                             ref: 'navigate_to_info',
@@ -565,6 +591,7 @@
                 {
                     event: 'CHANGE',
                     enable: true,
+                    priority: 0,
                     rules: [
                         {
                             ref: 'initial_state',
@@ -620,6 +647,22 @@
                                 'sifa_getValue("field_interior")=="int_black" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_black.webp)") : null;',
                                 'sifa_getValue("field_interior")=="int_amido" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_amido.webp)") : null;',
                                 'sifa_getValue("field_interior")=="int_chestnut" ? sifa_setElementStyle("group_interior_view", "backgroundImage", "url(./bmw_resources/int_chestnut.webp)") : null;',
+
+
+                                // Render Summary Notes
+                                'sifa_setVariable("summary", "<small>Your 2026</small><br/><span style=\\"font-size:20px;\\">iX xDrive45</span><br/><br/>")',
+                                'sifa_getValue("field_look")!=null ? sifa_setVariable("summary",      sifa_getVariable("summary") + "<strong>Design: </strong>" + sifa_getValue("field_look") + "<br/>") : null;',
+                                'sifa_getValue("field_color")!=null ? sifa_setVariable("summary",     sifa_getVariable("summary") + "<strong>Color: </strong>" + sifa_getValue("field_color") + "<br/>") : null;',
+                                'sifa_getValue("field_wheels")!=null ? sifa_setVariable("summary",    sifa_getVariable("summary") + "<strong>Wheels: </strong>" + sifa_getValue("field_wheels") + "<br/>") : null;',
+                                'sifa_getValue("field_interior")!=null ? sifa_setVariable("summary",  sifa_getVariable("summary") + "<strong>Interior: </strong>" + sifa_getValue("field_interior") + "<br/>") : null;',
+
+                                'sifa_setVariable("summary",  sifa_getVariable("summary") + "<br/><hr><br/>Total price (MSRP)<br/><strong style=\\"font-size:20px;\\">$" + sifa_getVariable("msrp_price").toLocaleString() + "</strong>")',
+
+                                'sifa_setVariable("summary",  sifa_getVariable("summary") + "<br/><br/><a class=\\"sum_link\\" href=\\"https://www.bmwusa.com/contact/byo-testdrive.html?vehiclenamodelcode=26II&vehiclecmid=fuv5iqnz\\" target=\\"_blank\\">Schedule test drive</a>")',
+
+                                'sifa_setElementText("group_summary_notes", sifa_getVariable("summary"))'
+
+
                             ],
                             false_actions: []
                         }

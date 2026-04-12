@@ -12,7 +12,346 @@
  * All actions defined in this file will be labeled sifa_actionName.
  * 
  **/
-
+export function actionInfo(ref){
+    let info = {
+        'hideElement': {
+            desc: 'Hides the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element to hide.', 
+            parameters: ['ref: string - The reference of the element to hide.'],
+            syntax: 'sifa_hideElement(ref)'
+        },
+        'showElement': {
+            desc: 'Shows the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element to show.', 
+            parameters: ['ref: string - The reference of the element to show.'],
+            syntax: 'sifa_showElement(ref)'
+        },
+        'setClass': {
+            desc: 'Adds a class to the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element. <br/> <b>cls</b> = string - The class to add', 
+            parameters: ['ref: string - The reference of the element.', 'cls: string - The class to add.'],
+            syntax: 'sifa_setClass(ref, cls)'
+        },
+        'removeClass': {
+            desc: 'Removes a class from the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element. <br/> <b>cls</b> = string - The class to remove', 
+            parameters: ['ref: string - The reference of the element.', 'cls: string - The class to remove.'],
+            syntax: 'sifa_removeClass(ref, cls)'
+        },
+        'toggleClass': {
+            desc: 'Toggles a class on the element that matches the specified reference. <br/> <b>ref</b> = string - the reference of the element. <br/> <b>cls</b> = string - the class to toggle', 
+            parameters: ['ref: string - the reference of the element.', 'cls: string - the class to toggle.'],
+            syntax: 'sifa_toggleClass(ref, cls)'
+        },
+        'setAttribute': {
+            desc: 'Sets an attribute on the element that matches the specified reference. <br/> <b>ref</b> = string - the reference of the element. <br/> <b>attr</b> = string - the attribute to set. [title, id, alt] <br/> <b>value</b> = string - the value to set.', 
+            parameters: ['ref: string - the reference of the element.', 'attr: string - the attribute to set.', 'value: string - the value to set.'],
+            syntax: 'sifa_setAttribute(ref, attr, value)'
+        },
+        'setElementStyle': {
+            desc: 'Sets a style property on the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element. <br/> <b>styleProp</b> = string - The style property to set. <br/> <b>value</b> = string - The value to set.', 
+            parameters: ['ref: string - the reference of the element.', 'styleProp: string - the style property to set.', 'value: string - the value to set.'],
+            syntax: 'sifa_setElementStyle(ref, styleProp, value)'
+        },
+        'removeAttribute': {
+            desc: 'Removes an attribute from the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element. <br/> <b>attr</b> = string - The attribute to remove.', 
+            parameters: ['ref: string - The reference of the element.', 'attr: string - The attribute to remove.'],
+            syntax: 'sifa_removeAttribute(ref, attr)'
+        },
+        'setElementText': {
+            desc: 'Sets the text content of the element that matches the specified reference. <br/> <b>ref</b> = string - The reference of the element. <br/> <b>text</b> = string - The text to set.', 
+            parameters: ['ref: string - The reference of the element.', 'text: string - The text to set.'],
+            syntax: 'sifa_setElementText(ref, text)'
+        },
+        'setValue': {
+            desc: 'Sets the value of the specified input field. <br/> <b>ref</b> = string - the reference of the input field. <br/> <b>value</b> = string - the value to set.',
+            parameters: ['ref: string - the reference of the input field.', 'value: string - the value to set.'],
+            syntax: 'sifa_setValue(ref, value)'
+        },
+        'getValue': {
+            desc: 'Gets the value of the specified input field. <br/> <b>ref</b> = string - the reference of the input field.',
+            parameters: ['ref: string - the reference of the input field.'],
+            syntax: 'sifa_getValue(ref)'
+        },
+        'clearValue': {
+            desc: 'Clears the value of the specified input field. <br/> <b>ref</b> = string - the reference of the input field.',
+            parameters: ['ref: string - the reference of the input field.'],
+            syntax: 'sifa_clearValue(ref)'
+        },
+        'clearGroup': {
+            desc: 'Clears all input fields within the specified group element. <br/> <b>ref</b> = string - the reference of the group element.',
+            parameters: ['ref: string - the reference of the group element.'],
+            syntax: 'sifa_clearGroup(ref)'
+        },
+        'hideOptions': {
+            desc: 'Hides specific options within a select element. <br/> <b>ref</b> = string - the reference of the select element. <br/> <b>options</b> = array - the values of the options to hide.',
+            parameters: ['ref: string - the reference of the select element.', 'options: array - the values of the options to hide.'],
+            syntax: 'sifa_hideOptions(ref, options)'
+        },
+        'showOptions': {
+            desc: 'Shows specific options within a select element. <br/> <b>ref</b> = string - the reference of the select element. <br/> <b>options</b> = array - the values of the options to show.',
+            parameters: ['ref: string - the reference of the select element.', 'options: array - the values of the options to show.'],
+            syntax: 'sifa_showOptions(ref, options)'
+        },
+        'addOptions': {
+            desc: 'Adds options to a select element. <br/> <b>ref</b> = string - the reference of the select element. <br/> <b>options</b> = array - the options to add, each option should be an object with "value" and "text" properties.',
+            parameters: ['ref: string - the reference of the select element.', 'options: array - the options to add, each option should be an object with "value" and "text" properties.'],
+            syntax: 'sifa_addOptions(ref, options)'
+        },
+        'removeOptions': {
+            desc: 'Removes options from a select element. <br/> <b>ref</b> = string - the reference of the select element. <br/> <b>options</b> = array - the values of the options to remove.',
+            parameters: ['ref: string - the reference of the select element.', 'options: array - the values of the options to remove.'],
+            syntax: 'sifa_removeOptions(ref, options)'
+        },
+        'resetOptions': {
+            desc: 'Resets the options of a select element to its original state. <br/> <b>ref</b> = string - the reference of the select element.',
+            parameters: ['ref: string - the reference of the select element.'],
+            syntax: 'sifa_resetOptions(ref)'
+        },
+        'triggeredField': {
+            desc: 'Checks if the specified field triggered the current action. <br/> <b>ref</b> = string - the reference of the field to check.',
+            parameters: ['ref: string - the reference of the field to check.'],
+            syntax: 'sifa_triggeredField(ref)'
+        },
+        'inputHasValue': {
+            desc: 'Checks if the specified input field has a value. <br/> <b>ref</b> = string - the reference of the input field.',
+            parameters: ['ref: string - the reference of the input field.'],
+            syntax: 'sifa_inputHasValue(ref)'
+        },
+        'inputIsEmpty': {
+            desc: 'Checks if the specified input field is empty. <br/> <b>ref</b> = string - the reference of the input field.',
+            parameters: ['ref: string - the reference of the input field.'],
+            syntax: 'sifa_inputIsEmpty(ref)'
+        },
+        'inputIsChecked': {
+            desc: 'Checks if the specified radio/checkbox input is checked. <br/> <b>ref</b> = string - the reference of the input field. <br/> <b>value</b> = string - the value of the radio/checkbox to check.',
+            parameters: ['ref: string - the reference of the input field.', 'value: string - the value of the radio/checkbox to check.'],
+            syntax: 'sifa_inputIsChecked(ref, value)'
+        },
+        'isGreaterThan': {
+            desc: 'Checks if a value is greater than a threshold. <br/> <b>value</b> = string|number - the value to check. <br/> <b>threshold</b> = string|number - the threshold to compare against.',
+            parameters: ['value: string|number - the value to check.', 'threshold: string|number - the threshold to compare against.'],
+            syntax: 'sifa_isGreaterThan(value, threshold)'
+        },
+        'isLessThan': {
+            desc: 'Checks if a value is less than a threshold. <br/> <b>value</b> = string|number - the value to check. <br/> <b>threshold</b> = string|number - the threshold to compare against.',
+            parameters: ['value: string|number - the value to check.', 'threshold: string|number - the threshold to compare against.'],
+            syntax: 'sifa_isLessThan(value, threshold)'
+        },
+        'isEqualTo': {
+            desc: 'Checks if a value is equal to a target. <br/> <b>value</b> = string|number - the value to check. <br/> <b>target</b> = string|number - the target to compare against.',
+            parameters: ['value: string|number - the value to check.', 'target: string|number - the target to compare against.'],
+            syntax: 'sifa_isEqualTo(value, target)'
+        },
+        'isNotEqualTo': {
+            desc: 'Checks if a value is not equal to a target. <br/> <b>value</b> = string|number - the value to check. <br/> <b>target</b> = string|number - the target to compare against.',
+            parameters: ['value: string|number - the value to check.', 'target: string|number - the target to compare against.'],
+            syntax: 'sifa_isNotEqualTo(value, target)'
+        },
+        'isGreaterThanOrEqualTo': {
+            desc: 'Checks if a value is greater than or equal to a threshold. <br/> <b>value</b> = string|number - the value to check. <br/> <b>threshold</b> = string|number - the threshold to compare against.',
+            parameters: ['value: string|number - the value to check.', 'threshold: string|number - the threshold to compare against.'],
+            syntax: 'sifa_isGreaterThanOrEqualTo(value, threshold)'
+        },
+        'isLessThanOrEqualTo': {
+            desc: 'Checks if a value is less than or equal to a threshold. <br/> <b>value</b> = string|number - the value to check. <br/> <b>threshold</b> = string|number - the threshold to compare against.',
+            parameters: ['value: string|number - the value to check.', 'threshold: string|number - the threshold to compare against.'],
+            syntax: 'sifa_isLessThanOrEqualTo(value, threshold)'
+        },
+        'isBetween': {
+            desc: 'Checks if a value is between a minimum and maximum (inclusive). <br/> <b>value</b> = string|number - the value to check. <br/> <b>min</b> = string|number - the minimum threshold. <br/> <b>max</b> = string|number - the maximum threshold.',
+            parameters: ['value: string|number - the value to check.', 'min: string|number - the minimum threshold.', 'max: string|number - the maximum threshold.'],
+            syntax: 'sifa_isBetween(value, min, max)'
+        },
+        'isBetweenExclusive': {
+            desc: 'Checks if a value is between a minimum and maximum (exclusive). <br/> <b>value</b> = string|number - the value to check. <br/> <b>min</b> = string|number - the minimum threshold. <br/> <b>max</b> = string|number - the maximum threshold.',
+            parameters: ['value: string|number - the value to check.', 'min: string|number - the minimum threshold.', 'max: string|number - the maximum threshold.'],
+            syntax: 'sifa_isBetweenExclusive(value, min, max)'
+        },
+        'setVariable': {
+            desc: 'Sets a variable in the outcome. <br/> <b>ref</b> = string - the reference of the variable. <br/> <b>value</b> = any - the value to set.',
+            parameters: ['ref: string - the reference of the variable.', 'value: any - the value to set.'],
+            syntax: 'sifa_setVariable(ref, value)'
+        },
+        'getVariable': {
+            desc: 'Gets a variable from the outcome. <br/> <b>ref</b> = string - the reference of the variable.',
+            parameters: ['ref: string - the reference of the variable.'],
+            syntax: 'sifa_getVariable(ref)'
+        },
+        'clearVariable': {
+            desc: 'Clears a variable from the outcome. <br/> <b>ref</b> = string - the reference of the variable.',
+            parameters: ['ref: string - the reference of the variable.'],
+            syntax: 'sifa_clearVariable(ref)'
+        },
+        'variableEquals': {
+            desc: 'Checks if a variable equals a value. <br/> <b>ref</b> = string - the reference of the variable. <br/> <b>value</b> = any - the value to compare against.',
+            parameters: ['ref: string - the reference of the variable.', 'value: any - the value to compare against.'],
+            syntax: 'sifa_variableEquals(ref, value)'
+        },
+        'variableContains': {
+            desc: 'Checks if a variable (string or array) contains a value. <br/> <b>ref</b> = string - the reference of the variable. <br/> <b>value</b> = any - the value to check for.',
+            parameters: ['ref: string - the reference of the variable.', 'value: any - the value to check for.'],
+            syntax: 'sifa_variableContains(ref, value)'
+        },
+        'setAnswers': {
+            desc: 'Sets multiple answers in the outcome at once. <br/> <b>answers</b> = object - an object where keys are answer references and values are the answers to set.',
+            parameters: ['answers: object - an object where keys are answer references and values are the answers to set.'],
+            syntax: 'sifa_setAnswers(answers)'
+        },
+        'getAnswer': {
+            desc: 'Gets an answer from the outcome. <br/> <b>ref</b> = string - the reference of the answer.',
+            parameters: ['ref: string - the reference of the answer.'],
+            syntax: 'sifa_getAnswer(ref)'
+        },
+        'copyAnswer': {
+            desc: 'Copies the value of one answer to another. <br/> <b>fromRef</b> = string - the reference of the answer to copy from. <br/> <b>toRef</b> = string - the reference of the answer to copy to.',
+            parameters: ['fromRef: string - the reference of the answer to copy from.', 'toRef: string - the reference of the answer to copy to.'],
+            syntax: 'sifa_copyAnswer(fromRef, toRef)'
+        },
+        'clearAnswers': {
+            desc: 'Clears multiple answers from the outcome. <br/> <b>refs</b> = array - an array of answer references to clear.',
+            parameters: ['refs: array - an array of answer references to clear.'],
+            syntax: 'sifa_clearAnswers(refs)'
+        },
+        'answerEquals': {
+            desc: 'Checks if an answer equals a value. <br/> <b>ref</b> = string - the reference of the answer. <br/> <b>value</b> = any - the value to compare against.',
+            parameters: ['ref: string - the reference of the answer.', 'value: any - the value to compare against.'],
+            syntax: 'sifa_answerEquals(ref, value)'
+        },
+        'answerContains': {
+            desc: 'Checks if an answer (string or array) contains a value. <br/> <b>ref</b> = string - the reference of the answer. <br/> <b>value</b> = any - the value to check for.',
+            parameters: ['ref: string - the reference of the answer.', 'value: any - the value to check for.'],
+            syntax: 'sifa_answerContains(ref, value)'
+        },
+        'answerNotEmpty': {
+            desc: 'Checks if an answer is not empty. <br/> <b>ref</b> = string - the reference of the answer.',
+            parameters: ['ref: string - the reference of the answer.'],
+            syntax: 'sifa_answerNotEmpty(ref)'
+        },
+        'addLog': {
+            desc: 'Adds a log entry to the outcome. <br/> <b>message</b> = string - the log message to add.',
+            parameters: ['message: string - the log message to add.'],
+            syntax: 'sifa_addLog(message)'
+        },
+        'getLogs': {
+            desc: 'Gets all log entries from the outcome.',
+            parameters: [],
+            syntax: 'sifa_getLogs()'
+        },
+        'clearLogs': {
+            desc: 'Clears all log entries from the outcome.',
+            parameters: [],
+            syntax: 'sifa_clearLogs()'
+        },
+        'stopRules': {
+            desc: 'Stops further rule processing for the current trigger.',
+            parameters: [],
+            syntax: 'sifa_stopRules()'
+        },
+        'delayAction': {
+            desc: 'Delays the execution of an action by a specified amount of time. <br/> <b>action</b> = function - the action to delay. <br/> <b>delay</b> = number - the delay in milliseconds.',
+            parameters: ['action: function - the action to delay.', 'delay: number - the delay in milliseconds.'],
+            syntax: 'sifa_delayAction(action, delay)'
+        },
+        'triggerRule': {
+            desc: 'Triggers a rule by its reference. <br/> <b>ref</b> = string - the reference of the rule to trigger.',
+            parameters: ['ref: string - the reference of the rule to trigger.'],
+            syntax: 'sifa_triggerRule(ref)'
+        },
+        'toNumber': {
+            desc: 'Converts a value to a number. <br/> <b>value</b> = any - the value to convert. <br/> If the value cannot be converted to a number, it returns NaN.',
+            parameters: ['value: any - the value to convert.'],
+            syntax: 'sifa_toNumber(value)'
+        },
+        'toString': {
+            desc: 'Converts a value to a string. <br/> <b>value</b> = any - the value to convert.',
+            parameters: ['value: any - the value to convert.'],
+            syntax: 'sifa_toString(value)'
+        },
+        'isNumber': {
+            desc: 'Checks if a value is a number. <br/> <b>value</b> = any - the value to check.',
+            parameters: ['value: any - the value to check.'],
+            syntax: 'sifa_isNumber(value)'
+        },
+        'length': {
+            desc: 'Gets the length of a value (string or array). <br/> <b>value</b> = any - the value to get the length of.',
+            parameters: ['value: any - the value to get the length of.'],
+            syntax: 'sifa_length(value)'
+        },
+        'upperCase': {
+            desc: 'Converts a string to uppercase. <br/> <b>value</b> = string - the string to convert.',
+            parameters: ['value: string - the string to convert.'],
+            syntax: 'sifa_upperCase(value)'
+        },
+        'lowerCase': {
+            desc: 'Converts a string to lowercase. <br/> <b>value</b> = string - the string to convert.',
+            parameters: ['value: string - the string to convert.'],
+            syntax: 'sifa_lowerCase(value)'
+        },
+        'upperLowerCase': {
+            desc: 'Converts a string to uppercase or lowercase based on a condition. <br/> <b>value</b> = string - the string to convert. <br/> <b>toCase</b> = string - "upper" to convert to uppercase, "lower" to convert to lowercase.',
+            parameters: ['value: string - the string to convert.', 'toCase: string - "upper" to convert to uppercase, "lower" to convert to lowercase.'],
+            syntax: 'sifa_upperLowerCase(value, toCase)'
+        },
+        'addition': {
+            desc: 'Adds two numbers together. <br/> <b>value1</b> = number - the first value. <br/> <b>value2</b> = number - the second value.',
+            parameters: ['value1: number - the first value.', 'value2: number - the second value.'],
+            syntax: 'sifa_addition(value1, value2)'
+        },
+        'subtraction': {
+            desc: 'Subtracts the second number from the first. <br/> <b>value1</b> = number - the first value. <br/> <b>value2</b> = number - the second value.',
+            parameters: ['value1: number - the first value.', 'value2: number - the second value.'],
+            syntax: 'sifa_subtraction(value1, value2)'
+        },
+        'multiplication': {
+            desc: 'Multiplies two numbers together. <br/> <b>value1</b> = number - the first value. <br/> <b>value2</b> = number - the second value.',
+            parameters: ['value1: number - the first value.', 'value2: number - the second value.'],
+            syntax: 'sifa_multiplication(value1, value2)'
+        },
+        'division': {
+            desc: 'Divides the first number by the second. <br/> <b>value1</b> = number - the first value. <br/> <b>value2</b> = number - the second value.',
+            parameters: ['value1: number - the first value.', 'value2: number - the second value.'],
+            syntax: 'sifa_division(value1, value2)'
+        },
+        'addBomItem': {
+            desc: 'Adds an item to the Bill of Materials to SIFA.outcome.mbom <br/> <b>item</b> = String SKU / Part Number <br/><br/> <ul><li>description</li><li>revision</li><li>parent_sku</li><li>UOM</li><li>quantity</li><li>unitcost</li><li>price</li></ul> <br/> Additional key-value pairs can be included in the item object as needed. <br/> The example above shows the prebuilt keys that SIFA will recognize',
+            parameters: ['item: object - the item to add, should have properties like "sku", "description", "revision", "parent_sku", "UOM", "quantity", "unitcost", "price", etc.'],
+            syntax: 'sifa_addBomItem(item, {key: "value"})'
+        },
+        'removeBomItem': {
+            desc: 'Removes an item from the Bill of Materials from SIFA.outcome.mbom. <br/> <b>item</b> = String SKU / Part Number',
+            parameters: ['item: string - the SKU or identifier of the item to remove.'],
+            syntax: 'sifa_removeBomItem(item)'
+        },
+        'updateBomItem': {
+            desc: 'Updates an item in the Bill of Materials to SIFA.outcome.mbom. <br/> <b>item</b> = String SKU / Part Number <br/><br/> <ul><li>description</li><li>revision</li><li>parent_sku</li><li>UOM</li><li>quantity</li><li>unitcost</li><li>price</li></ul> <br/> Additional key-value pairs can be included in the item object as needed. <br/> The example above shows the prebuilt keys that SIFA will recognize',
+            parameters: ['item: string - the SKU or identifier of the item to update.', 'updates: object - an object with the properties to update, e.g. {quantity: 10, cost: 5.99}'],
+            syntax: 'sifa_updateBomItem(item, {key: "value"})'
+        },
+        'basePrice': {
+            desc: 'Calculates and sets a base price. <br/> Price + Unit <br/> set = {type: percent | unit, value: number}',
+            parameters: ['set: Object{type: percent | unit, value: number}'],
+            syntax: 'sifa_basePrice({type: "unit", value: 0})'
+        },
+        'discountPrice': {
+            desc: 'Calculates the price after applying a discount. <br/> set = {type: percent | unit, value: number}',
+            parameters: ['set: Object{type: percent | unit, value: number}'],
+            syntax: 'sifa_discountPrice({type: "unit", value: 0})'
+        },
+        'costPlusPrice': {
+            desc: 'Calculates the price using a cost-plus method. <br/> set = {type: percent | unit, value: number}',
+            parameters: ['set: Object{type: percent | unit, value: number}'],
+            syntax: 'sifa_costPlusPrice({type: "unit", value: 0})'
+        },
+        'getPrice': {
+            desc: 'Returns the current price from SIFA.outcome.saleprice',
+            parameters: [],
+            syntax: 'sifa_getPrice()'
+        },
+        'getCost': {
+            desc: 'Returns the current cost from SIFA.outcome.unitcost',
+            parameters: [],
+            syntax: 'sifa_getCost()'
+        }
+    };
+    return info[ref] ? info[ref] : null;
+}
 
 // ELEMENT and VISIBILITY CONTROL
 export function hideElement(ref){
@@ -105,8 +444,7 @@ export function setElementStyle(ref, styleProp, value){
     }catch(e){
         console.warn(e);        return false;
     }
-}   
-
+}
 export function removeAttribute(ref, attr){
     try{
         let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, attr:attr});

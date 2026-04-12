@@ -493,7 +493,7 @@ export class SifaEngine {
                 .sifae-window {
                     position: fixed;
                     inset: 0 auto 0 0;
-                    font-family: monospace, Arial, sans-serif;
+                    font-family: monospace, Arial, sans-serif !important;
                     color: var(--sifae-text);
                     background: var(--sifae-bg);
                     font-size: 12px;
@@ -508,11 +508,15 @@ export class SifaEngine {
                     position: absolute;
                     transform: rotate(90deg);
                     background: var(--sifae-bg);
-                    right: -74px;
+                    font-family: monospace, Arial, sans-serif !important;
+                    right: -62px;
+                    width: 100px;
+                    text-align: center;
+                    height: 26px;
+                    padding-top: 8px;
+                    box-sizing: border-box;
                     inset-block: 0;
                     margin: auto;
-                    height: fit-content;
-                    padding: 8px 22px;
                     cursor: pointer;
                     border-radius: var(--sifae-radius) var(--sifae-radius) 0 0;
                     border-right: 1px solid #666;
@@ -538,7 +542,7 @@ export class SifaEngine {
                     border-right: 1px solid #666;
                 }
                 .sifae_tabs button {
-                    font-family: monospace, Arial, sans-serif;
+                    font-family: monospace, Arial, sans-serif !important;
                     background: none; border: none;
                     cursor: pointer;
                     width: fit-content;
@@ -547,10 +551,11 @@ export class SifaEngine {
                 .sifae-window select,
                 .sifae-window textarea{ 
                     padding: 4px; 
-                    font-family: monospace, Arial, sans-serif;
+                    font-family: monospace, Arial, sans-serif !important;
+                    box-sizing: border-box;
                 }
                 .sifa-rule-block {
-                    font-family: monospace, Arial, sans-serif;
+                    font-family: monospace, Arial, sans-serif !important;
                     display: grid;
                     grid-template-columns: 30px 100px 100px auto 30px;
                     width: calc(100% - 16px);
@@ -653,7 +658,7 @@ export class SifaEngine {
                 {type:'button', html:'Settings', events:{click:()=>{ SIFA.editor_renderSettings(); }}},
                 {type:'button', html:'Rules(' + SIFA.rules.length + ')', events:{click:()=>{ SIFA.editor_RenderRulesets(); }}},
                 {type:'button', html:'Validation(' + SIFA.validationRules.length + ')', events:{click:()=>{ SIFA.editor_renderValidation(); }}},
-                {type:'button', html:'Variables(' + Object.keys(SIFA.outcome.variables).length + ')', events:{click:()=>{ SIFA.editor_renderVariables(); }}},
+                {type:'button', html:'Variables', events:{click:()=>{ SIFA.editor_renderVariables(); }}},
                 {type:'span'},
                 {type:'button', html:'(ƒ)', events:{click:()=>{ SIFA.editorLookup(); }}}
             ]},
@@ -918,7 +923,7 @@ export class SifaEngine {
         SIFA.genhtml({type:'h2', html:'Validations', parent:domParent, children:[
             {type:'button', html:'Add Validation Rule', attr:{class:'sifa-rule-add', style:'margin-left: 16px; padding: 4px 8px;'}, events:{click:()=>{
                 SIFA.validationRules.push({...newVal});
-                SIFA.editor_validation();
+                SIFA.editor_renderValidation();
             }}}
         ]});
         SIFA.genhtml({type:'p', html:'<br/>Use this section to build and manage your validation rules.<br/><br/>', parent:SIFA.editor.ele.editor_Window.sifae_content});
@@ -933,7 +938,7 @@ export class SifaEngine {
                         {type:'label', html:'Reference'},
                         {type:'label', html:'Enable'},
                         {type:'label', html:''},
-                        {type:'input', ref:'ref', attr:{type:'text', style:'width:100%;'}, events:{change:(e)=>{ rule.ref = e.target.value; SIFA.editor_validation(); }}},
+                        {type:'input', ref:'ref', attr:{type:'text', style:'width:100%;'}, events:{change:(e)=>{ rule.ref = e.target.value; SIFA.editor_renderValidation(); }}},
                         {type:'select', ref:'enable', attr:{class:'sifa-rule-enable'}, children:[
                             {type:'option', attr:{value:false}, html:'Disable'},
                             {type:'option', attr:{value:true}, html:'Enable'}
@@ -941,7 +946,7 @@ export class SifaEngine {
                         {type:'button', html:'-', attr:{title:'Delete this validation rule', class:'sifa-rule-del'}, events:{click:(e)=>{
                             confirm('Are you sure you want to delete this validation rule?') ? (() => {
                                 SIFA.validationRules.splice(SIFA.validationRules.indexOf(rule), 1);
-                                SIFA.editor_validation();
+                                SIFA.editor_renderValidation();
                             })() : null;
                         }}}
                     ]},

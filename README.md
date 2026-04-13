@@ -19,6 +19,7 @@ Field changes → Event fires → Rules evaluate → Actions run → Validations
 ## Demos
 
 [Pizza Builder](https://lwinter.tech/devproj/sifa/demos/pizza.html)
+[BMW Builder](https://lwinter.tech/devproj/sifa/demos/bmw.html)
 
 ---
 
@@ -52,7 +53,7 @@ All three files must live in the same directory. The engine uses ES module dynam
 
 ## Quick Start
 
-[Documentation](https://localhost:441/devproj/sifa/docs/)
+[Documentation](https://lwinter.tech/devproj/sifa/docs/)
 
 ### 1. Mark up your HTML
 

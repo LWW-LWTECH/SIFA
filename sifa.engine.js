@@ -622,6 +622,7 @@ export class SifaEngine {
                     grid-template-columns: 250px auto 50px;
                     cursor: pointer;
                     padding: 8px;
+                    font-size: 12px;
                 }
                 .suggestion:hover { background-color: rgba(100,100,100,0.1); }
                 .sifae_active { background-color: var(--sifae-blue); color: white; }
@@ -951,7 +952,7 @@ export class SifaEngine {
                         }}}
                     ]},
                     {type:'label', html:'Condition'},
-                    {type:'input', ref:'condition', attr:{type:'text', style:'width:100%;'}, events:{change:(e)=>{ rule.condition = e.target.value; }}},
+                    {type:'input', ref:'condition', attr:{type:'text', class:'sifae-lookupfield', style:'width:100%;'}, events:{change:(e)=>{ rule.condition = e.target.value; }}},
                     {type:'label', html:'True Message'},
                     {type:'input', ref:'true_message', attr:{type:'text', style:'width:100%;'}, events:{change:(e)=>{ rule.true_message = e.target.value; }}},
                     {type:'label', html:'False Message'},
@@ -964,6 +965,14 @@ export class SifaEngine {
             val.form.condition.value = rule.condition;
             val.form.true_message.value = rule.true_message;
             val.form.false_message.value = rule.false_message;
+        }
+
+        // Add lookup field listeners
+        let sifaeLookupfields = domParent.querySelectorAll('.sifae-lookupfield');
+        for(let field of sifaeLookupfields){
+            field.addEventListener('focus', e => {
+                SIFA.editor.lookupField = e.target;
+            });
         }
     }
 

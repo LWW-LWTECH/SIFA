@@ -1171,6 +1171,22 @@ export function removeLocalStorage(key){
     }
 }
 
+export function exportSIFAConfig(){
+    let config = {};
+    config.rules = SIFA.rules;
+    config.validationRules = SIFA.validationRules;
+    config.answers = SIFA.outcome.answers;
+    config.variables = SIFA.outcome.variables;
+    config.debug = SIFA.settings.debug;
+    config.editMode = SIFA.settings.editMode;
+    config.targetElement = SIFA.settings.targetElement;
+    config.targetGroup = SIFA.settings.targetGroup;
+    config.targetInput = SIFA.settings.targetInput;
+    config.targetValidation = SIFA.settings.targetValidation;
+    config.taxRate = SIFA.settings.taxRate;
+    return JSON.stringify(config, null, 2);
+}
+
 /* Utility Functions */
 function sifa_findRule(ref, rulegroups = SIFA.rules) {
     let foundrule = false;

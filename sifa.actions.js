@@ -476,7 +476,6 @@ export function setElementText(ref, text){
     }
 }
 
-
 // FIELD VALUE CONTROL
 export function setValue(ref, value){
     try{
@@ -676,7 +675,6 @@ export function resetOptions(ref){
     }else{ console.warn('resetOptions requires the input to be a select or select-multiple'); return false; }
 }
 
-
 // CONDITION CHECKS
 export function triggeredField(ref){
     try{
@@ -813,7 +811,6 @@ export function isBetweenExclusive(value, min, max) {
     }
 }
 
-
 // VARIABLES CONTROL
 export function setVariable(ref, value){
     try{
@@ -851,7 +848,6 @@ export function variableContains(ref, value){
     if(SIFA.outcome.variables[inputs.ref] === undefined){ console.warn('variableContains could not find ref ' + inputs.ref); return false; }
     return SIFA.outcome.variables[inputs.ref].includes(inputs.value);
 }
-
 
 // ANSWERS CONTROL
 export function setAnswers(answer){
@@ -915,7 +911,6 @@ export function answerNotEmpty(ref){
     return true;
 }
 
-
 // LOGGING and DEBUGGING
 export function addLog(key, value){
     let inputs = sifa_checkIfNestedOutcomeMulti({key:key, value:value});
@@ -931,7 +926,6 @@ export function logAnswer(ref){
     addLog("logAnswer", {"ref": inputs.ref, "value": ans});
 }
 
-
 // FLOW CONTROL
 export function stopRules(){
     SIFA.engine.state = false;
@@ -946,7 +940,6 @@ export function triggerRule(ruleRef){
     if(!rule){ console.warn(`triggerRule: Rule "${inputs.ruleRef}" not found.`); return; }
     return SIFA.runRule(rule);
 }
-
 
 // CASTING ACTIONS
 export function toNumber(value){
@@ -1026,7 +1019,6 @@ export function division(value1, value2){
     return num1 / num2;
 }
 
-
 // BOM CONTROL
 export function addBomItem(item, data){
     let inputs = sifa_checkIfNestedOutcomeMulti({item:item});
@@ -1054,58 +1046,130 @@ export function updateBomItem(item, data){
     SIFA.outcome.mbom[inputs.item] = {...SIFA.outcome.mbom[inputs.item], ...data};
 }
 
-
 // PRICE CALCULATIONS
-export function basePrice(set){
-    let value = set.value ? set.value : 0;
-    let num = int_isNumber(value) ? int_toNumber(value) : null;
-    let type = set.type ? set.type : 'unit';
-    switch(type){
-        case 'percent':
-            num = num / 100;
-            SIFA.outcome.saleprice = SIFA.outcome.saleprice + (SIFA.outcome.saleprice * num);
-        break;
-        case 'unit':
-            SIFA.outcome.saleprice = SIFA.outcome.saleprice + num;
-        break;
+
+// Set or update a named price line
+export function addPriceLine(ref='', label='', type='', amount=0, method='UNIT'||'PERCENT', enabled=true){
+    if(ref=='' || label=='' || type=='' || amount==0){ return false; }
+    if(method.toUpperCase()!='UNIT' && method.toUpperCase()!='PERCENT'){ return false; }
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref, label:label, type:type, amount:amount, method:method, enabled:enabled});
+        SIFA.outcome.priceLedger.lines[inputs.ref] = {"label":inputs.label, "type":inputs.type, "amount":inputs.amount, "method":inputs.method, "enabled":inputs.enabled};
+        return true;
+    }catch(e){
+        console.error('addPriceLine', e);
+        return false;
     }
 }
-export function discountPrice(set){
-    let value = set.value ? set.value : 0;
-    let num = int_isNumber(value) ? int_toNumber(value) : null;
-    let type = set.type ? set.type : 'unit';
-    switch(type){
-        case 'percent':
-            num = num / 100;
-            SIFA.outcome.saleprice = SIFA.outcome.saleprice - (SIFA.outcome.saleprice * num);
-        break;
-        case 'unit':
-            SIFA.outcome.saleprice = SIFA.outcome.saleprice - num;
-        break;
+export function removePriceLine(ref=''){
+    if(ref==''){ return false; }
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref});
+        SIFA.outcome.priceLedger.lines[inputs.ref] ? delete SIFA.outcome.priceLedger.lines[inputs.ref] : null;
+        return true;
+    }catch(e){
+        console.error('removePriceLine', e);
+        return false; 
     }
 }
-export function costPlusPrice(set){
-    let value = set.value ? set.value : 0;
-    let num = int_isNumber(value) ? int_toNumber(value) : null;
-    let cost = SIFA.outcome.unitcost ? SIFA.outcome.unitcost : 0;
-    let type = set.type ? set.type : 'unit';
-    switch(type){
-        case 'percent':
-            num = num / 100;
-            SIFA.outcome.saleprice = SIFA.outcome.saleprice + (cost * num);
-        break;
-        case 'unit':
-            SIFA.outcome.saleprice = SIFA.outcome.saleprice + (cost + num);
-        break;
+export function enablePriceLine(ref=''){
+    if(ref==''){ return false; }
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref});
+        SIFA.outcome.priceLedger.lines[inputs.ref] ? SIFA.outcome.priceLedger.lines[inputs.ref].enabled = true : null;
+        return true;
+    }catch(e){
+        console.error('enablePriceLine', e);
+        return false;
     }
 }
-export function getPrice(){
-    return SIFA.outcome.saleprice ? SIFA.outcome.saleprice : 0;
+export function disablePriceLine(ref){
+    if(ref==''){ return false; }
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref});
+        SIFA.outcome.priceLedger.lines[inputs.ref] ? SIFA.outcome.priceLedger.lines[inputs.ref].enabled = false : null;
+        return true;
+    }catch(e){
+        console.error('disablePriceLine', e);
+        return false;
+    }
 }
-export function getCost(){
-    return SIFA.outcome.unitcost ? SIFA.outcome.unitcost : 0;
+export function getPriceLine(ref=''){
+    if(ref==''){ return false; }
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({ref:ref});
+        return SIFA.outcome.priceLedger.lines[inputs.ref] ? SIFA.outcome.priceLedger.lines[inputs.ref].amount : false;
+    }catch(e){
+        console.error('getPriceLine', e);
+        return false;
+    }
+}
+export function getPriceTypeTotal(type=''){
+    if(type==''){ return false; }
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({type:type});
+        let total = 0;
+        for(const [ref, line] of Object.entries(SIFA.outcome.priceLedger.lines)){
+            const method = line.method.toUpperCase() || 'UNIT';
+            let amount = line.amount || 0;
+            if(line.type.toUpperCase() == inputs.type.toUpperCase()){
+                if(method == 'PERCENT'){
+                    total = (total * amount);
+                }else{
+                    total += amount;
+                }
+            }
+        }
+        return total;
+    }catch(e){
+        console.error('getPriceTypeTotal', e);
+        return false;
+    }
+}
+export function getPriceTotal(){
+    return SIFA.outcome.priceLedger.total;
+}
+export function getPriceTax(){
+    return SIFA.outcome.priceLedger.tax;
+}
+export function getPriceCost(){
+    return SIFA.outcome.priceLedger.unitcost;
 }
 
+// Local Storage
+export function setLocalStorage(key, value){
+    let inputs = sifa_checkIfNestedOutcomeMulti({key:key, value:value});
+    try{
+        localStorage.setItem(inputs.key, JSON.stringify(inputs.value));
+        return true;
+    }catch(e){
+        console.error('setLocalStorage', e);
+        return false;
+    }
+}
+export function getLocalStorage(key){
+    let inputs = sifa_checkIfNestedOutcomeMulti({key:key});
+    try {
+        if(!(inputs.key in localStorage)){ return false; }
+        let value = localStorage.getItem(key);
+        try{ value = JSON.parse(value); }catch(e){}
+        return value;
+    }catch(e){
+        console.error('getLocalStorage', e);
+        return false;
+    }
+}
+export function removeLocalStorage(key){
+    let inputs = sifa_checkIfNestedOutcomeMulti({key:key});
+    try {
+        if(!(inputs.key in localStorage)){ return false; }
+        localStorage.removeItem(inputs.key);
+        return true;
+    }catch(e){
+        console.error('removeLocalStorage', e);
+        return false;
+    }
+}
 
 /* Utility Functions */
 function sifa_findRule(ref, rulegroups = SIFA.rules) {
@@ -1180,21 +1244,3 @@ function outputResult(name, inputs, outcome, error=null){
 function hasHTML(str) {
     return /<[a-z][\s\S]*>/i.test(str);
 }
-/*
-// Local Storage
-export function setLocalStorage(key, value){
-    localStorage.setItem(key, JSON.stringify(value));
-    return {outcome: true, value: value};
-}
-export function getLocalStorage(key){
-    if(!(key in localStorage)){ return {outcome: false, value: null}; }
-    let value = localStorage.getItem(key);
-    try{ value = JSON.parse(value); }catch(e){}
-    return {outcome: true, value: value};
-}
-export function removeLocalStorage(key){
-    if(!(key in localStorage)){ return {outcome: false}; }
-    localStorage.removeItem(key);
-    return {outcome: true};
-}
-*/

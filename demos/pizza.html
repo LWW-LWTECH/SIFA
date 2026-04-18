@@ -507,10 +507,9 @@ body {
 
 
 <script type="module">
-import { SifaEngine } from '../sifa.engine.js';
+import SifaEngine from '../sifa.engine.js';
 
 new SifaEngine({
-    editMode: true,
     debug: false,
     targetValidation:"#val-contact",
     rules: [
@@ -552,27 +551,25 @@ new SifaEngine({
                     active: 'true',
                     condition: 'true',
                     true_actions: [
-                        'sifa_setVariable("pizza_price", 0)',
-                        'sifa_getValue("field_size")=="small" ?             sifa_setVariable("pizza_price", sifa_addition(sifa_getVariable("pizza_price"), 14.00)) : null',
-                        'sifa_getValue("field_size")=="medium" ?            sifa_setVariable("pizza_price", sifa_addition(sifa_getVariable("pizza_price"), 18.00)) : null',
-                        'sifa_getValue("field_size")=="large" ?             sifa_setVariable("pizza_price", sifa_addition(sifa_getVariable("pizza_price"), 24.00)) : null',
-                        'sifa_getValue("field_crust")=="stuffed" ?          sifa_setVariable("pizza_price", sifa_addition(sifa_getVariable("pizza_price"), 3.50)) : null',
-                        'sifa_getValue("field_crust")=="glutenfree" ?       sifa_setVariable("pizza_price", sifa_addition(sifa_getVariable("pizza_price"), 4.00)) : null',
-                        'sifa_setElementText("ele_sum_pizza_price", "$" + sifa_getVariable("pizza_price").toFixed(2))',
+                        'sifa_getValue("field_size")=="small" ?             sifa_addPriceLine("pizza_price", "base price", "pizza", 14, "UNIT", true) : null',
+                        'sifa_getValue("field_size")=="medium" ?            sifa_addPriceLine("pizza_price", "base price", "pizza", 18, "UNIT", true) : null',
+                        'sifa_getValue("field_size")=="large" ?             sifa_addPriceLine("pizza_price", "base price", "pizza", 24, "UNIT", true) : null',
+                        'sifa_getValue("field_crust")=="stuffed" ?          sifa_addPriceLine("pizza_crust", "base price", "pizza", 3.50, "UNIT", true) : null',
+                        'sifa_getValue("field_crust")=="glutenfree" ?       sifa_addPriceLine("pizza_crust", "base price", "pizza", 4.00, "UNIT", true) : null',
 
-                        'sifa_setVariable("extras_price", 0)',
-                        'sifa_answerContains("field_extras", "extra_cheese") ?    sifa_setVariable("extras_price", sifa_addition(sifa_getVariable("extras_price"), 2.00)) : null',
-                        'sifa_answerContains("field_extras", "garlic_bread") ?    sifa_setVariable("extras_price", sifa_addition(sifa_getVariable("extras_price"), 5.00)) : null',
-                        'sifa_answerContains("field_extras", "dip") ?             sifa_setVariable("extras_price", sifa_addition(sifa_getVariable("extras_price"), 1.50)) : null',
-                        'sifa_answerContains("field_extras", "soft_drink") ?      sifa_setVariable("extras_price", sifa_addition(sifa_getVariable("extras_price"), 3.50)) : null',
-                        'sifa_answerContains("field_fulfillment", "delivery") ?   sifa_setVariable("extras_price", sifa_addition(sifa_getVariable("extras_price"), 4.50)) : null',
-                        'sifa_setElementText("ele_sum_extras_price", "$" + sifa_getVariable("extras_price").toFixed(2))',
+                        'sifa_answerContains("field_extras", "extra_cheese") ?    sifa_addPriceLine("extra_cheese", "additional price", "extra", 2.00, "UNIT", true) : null',
+                        'sifa_answerContains("field_extras", "garlic_bread") ?    sifa_addPriceLine("garlic_bread", "additional price", "extra", 5.00, "UNIT", true) : null',
+                        'sifa_answerContains("field_extras", "dip") ?             sifa_addPriceLine("dip", "additional price", "extra", 1.50, "UNIT", true) : null',
+                        'sifa_answerContains("field_extras", "soft_drink") ?      sifa_addPriceLine("soft_drink", "additional price", "extra", 3.50, "UNIT", true) : null',
+                        'sifa_answerContains("field_fulfillment", "delivery") ?   sifa_addPriceLine("fulfillment", "additional price", "extra", 4.50, "UNIT", true) : sifa_removePriceLine("fulfillment")',
+
+                        'sifa_setElementText("ele_sum_pizza_price", "$" + sifa_getPriceTypeTotal("pizza").toFixed(2))',
+                        'sifa_setElementText("ele_sum_extras_price", "$" + sifa_getPriceTypeTotal("extra").toFixed(2))',
+                        'sifa_setElementText("ele_sum_total", "$" + sifa_getPriceTotal("pizza_price"))',
 
                         'sifa_getValue("field_size")=="small" ?             sifa_setVariable("toppings_limit", 3) : null',
                         'sifa_getValue("field_size")=="medium" ?            sifa_setVariable("toppings_limit", 4) : null',
                         'sifa_getValue("field_size")=="large" ?             sifa_setVariable("toppings_limit", 5) : null',
-
-                        'sifa_setElementText("ele_sum_total", "$" + sifa_addition(sifa_getVariable("pizza_price"), sifa_getVariable("extras_price")).toFixed(2))',
                     ],
                     false_actions: []
                 },
@@ -706,7 +703,7 @@ new SifaEngine({
         }
     ],
     variables: {
-        'pizza': 'test'
+        'pizza': 'test',
     },
     validationRules: [
         {
@@ -762,6 +759,7 @@ new SifaEngine({
     }
 });
 
+console.log(SIFA);
 
 // ── Submit handler ──────────────────────────────────────────────────────────
 document.getElementById('place-order-btn').addEventListener('click', async () => {

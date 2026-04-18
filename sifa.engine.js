@@ -81,7 +81,7 @@ let run_rev   = Math.floor(Math.random() * 1984) * new Date().getTime();
 let global_acts; try { global_acts  = await import("./sifa.actions.js?ts=" + run_rev);   } catch (e) { console.warn('global_acts error', e); global_acts = null; }
 let custom_acts; try { custom_acts  = await import("./cust.actions.js?ts=" + run_rev);   } catch (e) { console.warn('custom_acts error', e); custom_acts = null; }
 
-export class SifaEngine {
+export default class SifaEngine {
     constructor(set){
         window.SIFA = this;
         SIFA.engine = { state: true }; // global state to control flow (e.g. stopRules)
@@ -95,12 +95,17 @@ export class SifaEngine {
             variables: {},      // List to store variables to be used later
             answers: {},        // List that stores all vaues from SIFA.fields
             validation: {},     // List that stores outcome from validation rules
-            mbom:{},             // List that stores bill of materials or other metadata
-            unitcost: 0.00,
-            saleprice: 0.00
+            mbom:{},            // List that stores bill of materials or other metadata
+            priceLedger:{       // Price calculation ledger
+                lines:{},       // { label: '', type:'', amount:0.00, method:'unit | percent', enabled: true|false}
+                unitcost: 0,
+                subtotal:0,
+                tax:0,
+                total:0
+            }
         };
         SIFA.setSettings(set);
-        SIFA.start().catch(e => console.error('SIFA start error', e));
+        SIFA.init().catch(e => console.error('SIFA start error', e));
     }
 
     setSettings(set={}){
@@ -121,7 +126,7 @@ export class SifaEngine {
         SIFA.outcome.variables = { ...SIFA.getUrlParams(), ...variables };
         SIFA.outcome.answers   = { ...SIFA.outcome.answers, ...answers };
     }
-    async start(){
+    async init(){
         // Global Class Functions
         if (global_acts) {
             for (const key in global_acts) {
@@ -238,7 +243,7 @@ export class SifaEngine {
         if (SIFA.settings.debug) console.log('SIFA Page Load Event', SIFA);
         await SIFA.processActions('LOAD');
         await SIFA.processValidations();
-        SIFA.calculateUnitCost();
+        await SIFA.calculatePrice();
         
         SIFA.settings.events.LOAD?.(SIFA.outcome);
     }
@@ -260,7 +265,7 @@ export class SifaEngine {
         SIFA.actions.sifa_setAnswers({ [baseKey]: value });
         await SIFA.processActions('CHANGE');
         await SIFA.processValidations();
-        SIFA.calculateUnitCost();
+        await SIFA.calculatePrice();
         SIFA.settings.events.CHANGE?.(target, SIFA.outcome);
     }
     async onClickEvent(target){
@@ -272,7 +277,7 @@ export class SifaEngine {
     async onSaveEvent(outcome=['answers']){
         await SIFA.processActions('SAVE');
         await SIFA.processValidations();
-        SIFA.calculateUnitCost();
+        await SIFA.calculatePrice();
         const aliases = {
             answers:    ['answers', 'answer', 'ans'],
             variables:  ['variables', 'variable', 'var'],
@@ -290,6 +295,16 @@ export class SifaEngine {
         SIFA.settings.events.SAVE?.(SIFA.outcome);
         if (SIFA.settings.debug) console.log('SIFA Save Outcome', return_outcome);
         return return_outcome;
+    }
+
+    openEditor(){
+        SIFA.settings.editMode = true;
+        SIFA.editor_Window();
+    }
+    closeEditor(){
+        SIFA.settings.editMode = false;
+        SIFA.editor.editor_CSS ? SIFA.editor.editor_CSS.remove() : null;
+        SIFA.editor.ele.editor_Window ? SIFA.editor.ele.editor_Window.remove() : null;
     }
 
     // Processing Rules
@@ -312,7 +327,6 @@ export class SifaEngine {
             }
         }
     }
-
     runRule(rule){
         if(SIFA.engine.state === false){ return false; }
         if (!rule.enable) return false;
@@ -327,6 +341,7 @@ export class SifaEngine {
                 if(SIFA.engine.state === false){ console.warn('SIFA engine state processing returned false, stopping further actions.'); return false; }
                 try{
                     SIFA.evaluateAction(SIFA.prefixFuncs(act));
+                    SIFA.calculatePrice();
                 }catch(e){
                     console.log(e);
                     return false;
@@ -334,7 +349,6 @@ export class SifaEngine {
             }
         }
     }
-
     // Process Validations
     async processValidations(){
         // Clear previous validation outcomes
@@ -359,33 +373,37 @@ export class SifaEngine {
             }
         }
     }
-
-    async calculateUnitCost(){
-        // Calculate unit cost based on mbom items
-        SIFA.outcome.unitcost = 0.00;
+    // Calculate Price
+    async calculatePrice(){
+        // Phase 1 - Unit Cost
+        SIFA.outcome.priceLedger.unitcost = 0;
         for(const item of Object.values(SIFA.outcome.mbom)){
-            SIFA.outcome.unitcost += (item.quantity * item.unitcost);
+            const qty = Number(item.quantity) || 0;
+            const cost = Number(item.cost) || 0;
+            SIFA.outcome.priceLedger.unitcost += qty * cost;
         }
 
-        // Process price rules
-        SIFA.outcome.saleprice = 0.00;
-        let func = SIFA.actions;
-        if(SIFA.settings.priceRules){
-            for(const rule of SIFA.settings.priceRules){
-                if(rule.enable === false){ continue; }
-                let condition = rule.condition ? SIFA.prefixFuncs(rule.condition) : 'true';
-                let conditionResult = await SIFA.evaluateAction(condition);
-                if(conditionResult === true){
-                    let pfun = this.prefixFuncs(rule.method);
-                    let settings = rule.set ? rule.set : {};
-                    pfun += `(settings)`;
-                    eval(pfun);
-                }else{
-                    if(SIFA.settings.debug) console.log(`SIFA Price Rule condition not met, skipping: ${condition}`);
-                }
+        // Phase 2 - Sum the rpice ledger
+        SIFA.outcome.priceLedger.subtotal = 0.00;
+        for(const [ref, line] of Object.entries(SIFA.outcome.priceLedger.lines)){
+            if(line.enable === false) continue;
+            let amount = Number(line.amount) || 0;
+            const method = line.method.toUpperCase() || 'UNIT'; // percent | unit
+            if(method == 'PERCENT'){
+                SIFA.outcome.priceLedger.subtotal = (SIFA.outcome.priceLedger.subtotal * amount);
+            }else{
+                SIFA.outcome.priceLedger.subtotal += amount;
             }
+            SIFA.outcome.priceLedger.subtotal = parseFloat(SIFA.outcome.priceLedger.subtotal.toFixed(10));
         }
+
+        // Phase 3 - Tax and totals
+        const rate = SIFA.settings.taxRate || 0;
+        const tax = rate > 0 ? SIFA.outcome.priceLedger.subtotal * (rate > 1 ? rate / 100 : rate) : 0.00;
+        SIFA.outcome.priceLedger.tax = parseFloat(tax.toFixed(10));
+        SIFA.outcome.priceLedger.total = parseFloat((SIFA.outcome.priceLedger.subtotal + tax).toFixed(10));
     }
+
     evaluateAction(action){
         let func = SIFA.actions;
         let data = eval(action);
@@ -694,7 +712,6 @@ export class SifaEngine {
         }
         SIFA.genhtml({type:'div', html:'<br/><hr/><br/>', parent:domParent});
     }
-
     editor_RenderRulesets(){
         SIFA.editor.ele.editor_Window.sifae_content.innerHTML = '';
         let newr = {ref: 'new', enable: false, priority: 0, active: '', condition: '', true_actions: [], false_actions: [] }
@@ -914,7 +931,6 @@ export class SifaEngine {
             SIFA.editor.lookupField.focus();
         }}});
     }
-
     editor_renderValidation(){
         let domParent = SIFA.editor.ele.editor_Window.sifae_content;
         domParent.innerHTML = '';
@@ -975,7 +991,6 @@ export class SifaEngine {
             });
         }
     }
-
     editor_renderVariables(){
         let domParent = SIFA.editor.ele.editor_Window.sifae_content;
         domParent.innerHTML = '';

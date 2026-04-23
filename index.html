@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIFA</title>
+    <link rel="icon" type="image/png" href="./demos/sifa_favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poiret+One&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --accent-color: #2470d8;
+            --page1-ink: #f5f2eb;
+            --page2-ink: hsl(43, 10%, 14%);
+            --page1-bg: #0d0d0f;
+            --page2-bg: hsl(240, 9%, 96%);
+        }
+        body {
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: "Montserrat", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            background: var(--page1-bg); 
+            color: var(--page1-ink);
+            overflow-x: hidden;
+        }
+        .page_width{
+            max-width: 900px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        .head_block{
+            position: relative;
+            inset: 0;
+            background-image: linear-gradient(rgba(245, 242, 235, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245, 242, 235, 0.04) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .head_accent{
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgb(24 106 156 / 28%) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            pointer-events: none;
+        }
+        .page_block{
+            background: var(--page2-bg);
+            color: var(--page2-ink);
+        }
+        .sample_block{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+        .logo{
+            max-width: 400px;
+            width: 90%;
+            margin: 40px 0 80px;
+            display: flex;
+        }
+        h1{
+            font-size: 3.5em;
+            line-height: 1.1;
+        }
+        .demo-tag {
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 3px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+        .tag-orange {
+            background: hsla(215, 71%, 49%, 0.2);
+            color: var(--accent-color);
+        }
+        .code_hint{
+            background: rgba(0,0,0,0.05);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .live_form{
+            background: white;
+            border: 1.5px solid var(--page2-ink);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 4px 4px 0 var(--page2-ink);
+        }
+        .form-label {
+            margin-bottom: .1rem;
+        }
+        .form-card-bar{
+            background: var(--page2-ink);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-card-body {
+            padding: 28px 28px 24px;
+            font-size: 0.8em;
+        }
+        .form-card-body input, .form-card-body select{
+            background: #fafafa;
+            border: 1.5px solid #ddd;
+            padding: 8px 14px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .radio-option:has(input:checked), .check-option:has(input:checked) {
+            border-color: var(--accent);
+            background: rgba(212, 68, 15, 0.06);
+            color: var(--accent);
+        }
+        .radio-option, .check-option {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #fafafa;
+            user-select: none;
+        }
+        .radio-option input, .check-option input {
+            display: none;
+        }
+        .sifa-group{
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
+        }
+        .form-price{
+            background: rgba(36, 112, 216, 0.1);
+            border: 1.5px solid var(--accent-color);
+            padding: 16px;
+            border-radius: 8px;
+            display: inline-block;
+            width: 100%;
+        }
+        .validation-fail{
+            padding: 8px;
+        }
+        .outcome-panel{
+            margin-top: 20px;
+            padding: 16px;
+            background: black;
+            border-radius: 6px;
+            font-family: rgba(255,255,255,0.8) monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            color: rgba(245, 242, 235, 0.75);
+        }
+
+        @media screen and (max-width: 768px) {
+            .sample_block{
+                display: flex;
+                flex-direction: column;
+            }
+            .sample-reverse{
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="head_block vw-100 vh-100" style="display: flex; align-items: center;">
+        <span class="head_accent"></span>
+        <div class="page_width">
+            <p style="color:var(--accent-color); display: flex; align-items: center; gap: 16px;"><span style="background-color: var(--accent-color); height: 1px; width: 70px; display: inline-block;"></span> Structured Interactive Form Actions</p>
+            <img src="./sifa_logo.png" alt="sifa logo" class="logo" />
+            <h1>Rules run the form. <div style="color:#2470d8;">You run the rules.</div></h1>
+            <h2 style="opacity: 0.4;">Rules-driven. Zero dependencies.</h2>
+            <br/>
+            <p style="font-size: 1.3em; opacity: 0.4;">
+                SIFA is a lightweight, rules-based form engine that scans your DOM and drives real-time behaviour — show/hide fields, validate inputs, calculate prices, manage state — all through a clean, declarative config.
+            </p>
+            <br/>
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); font-size: 0.7em;">
+                <span>
+                    <h2>4<span style="color:var(--accent-color);">+</span></h2><span style="opacity: 0.5;">EVENT TYPES</span>
+                </span>
+                <span>
+                    <h2>40<span style="color:var(--accent-color);">+</span></h2><span style="opacity: 0.5;">BUILT-IN ACTIONS</span>
+                </span>
+                <span>
+                    <h2>0</h2><span style="opacity: 0.5;">DEPENDENCIES</span>
+                </span>
+                <span>
+                    <h2>∞</h2><span style="opacity: 0.5;">CUSTOM ACTIONS</span>
+                </span>
+            </div>
+        </div>
+    </section>
+    <section class="page_block vw-100">
+        <div class="page_width">
+            <br/><br/>
+            <div style="display:grid; grid-template-columns: 1fr 1fr;">
+                <div>
+                    <div style="color:var(--accent-color);">Live Demos</div>
+                    <h2>SIFA in action.</h2>
+                </div>
+                <div>
+                    These forms are wired up to demonstrate real SIFA behaviours — conditional visibility, validation, dynamic pricing, and live state output. All running client-side, no server required.
+                </div>
+            </div>
+            <br/><br/>
+
+            <section class="sample_block">
+                <div>
+                    <br/><br/>
+                    <h1>01</h1>
+                    <div class="demo-tag tag-orange">Visibility · Validation</div>
+                    <h3>Conditional Fields & Live Validation</h3>
+                    <p>
+                        Selecting an account type reveals relevant sub-fields. Each field validates in real time, and the outcome panel reflects SIFA.outcome on every change.
+                    </p>
+                    <ul class="demo-features">
+                        <li>showElement / hideElement on CHANGE</li>
+                        <li>answerEquals condition check</li>
+                        <li>Validation rules with true / false messages</li>
+                    </ul>
+                    <br/>
+                    <pre class="code_hint">
+<b>condition:</b> sifa_triggeredField("business")
+<b>true_actions:</b> [
+    sifa_hideElement("group_account_companyname"),
+    sifa_hideElement("group_account_taxid"),
+    sifa_hideElement("group_account_organisationname"),
+    sifa_hideElement("group_account_charitynumber"),
+    sifa_showElement("group_account_companyname"),
+    sifa_showElement("group_account_taxid")
+]</pre>
+                </div>
+                <div>
+                    <p style="color:var(--accent-color); font-size: 0.8em;">● LIVE DEMO</p>
+                    <div class="live_form">
+                        <div class="form-card-bar">
+                            <div style="display: flex; gap: 0.5em; font-size: 0.8em;">
+                                <div>🔴</div>
+                                <div>🟡</div>
+                                <div>🟢</div>
+                            </div>
+                            <div style="color:var(--page1-ink);">account-registration.sifa</div>
+                        </div>
+                        <div class="form-card-body">
+                            <div class="sifa-group" id="account_type">
+                                <label class="form-label">Account Type</label>
+                                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr;">
+                                    <label class="radio-option" data-val="personal">
+                                        <input type="radio" name="account_type" value="personal"> 👤 Personal
+                                    </label>
+                                    <label class="radio-option" data-val="business">
+                                        <input type="radio" name="account_type" value="business"> 🏢 Business
+                                    </label>
+                                    <label class="radio-option" data-val="nonprofit">
+                                        <input type="radio" name="account_type" value="nonprofit"> 🤝 Non-profit
+                                    </label>
+                                </div>
+                            </div>
+                            <br/>
+
+                            <!-- Shown for all -->
+                            <div class="sifa-group" id="account_fullname">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-input" id="d1-name" placeholder="Jane Smith">
+                                <div id="d1-name-val"></div>
+                            </div>
+
+                            <!-- Business only -->
+                            <div id="d1-business-fields" class="sifa-hidden">
+                                <div class="sifa-group" id="account_companyname">
+                                    <label class="form-label">Company Name</label>
+                                    <input type="text" class="form-input" id="d1-company" placeholder="Acme Corp">
+                                </div>
+                                <div class="sifa-group" id="account_taxid">
+                                    <label class="form-label">ABN / Tax ID</label>
+                                    <input type="text" class="form-input" id="d1-abn" placeholder="12 345 678 901" maxlength="14">
+                                    <div class="sifa-element validation-fail" id="val_taxid"></div>
+                                </div>
+                            </div>
+
+                            <!-- Non-profit only -->
+                            <div id="d1-nonprofit-fields" class="sifa-hidden">
+                                <div class="sifa-group" id="account_organisationname">
+                                    <label class="form-label">Organisation Name</label>
+                                    <input type="text" class="form-input" id="d1-org" placeholder="Green Earth Foundation">
+                                </div>
+                                <div class="sifa-group" id="account_charitynumber">
+                                    <label class="form-label">Charity Number</label>
+                                    <input type="text" class="form-input" id="d1-charity" placeholder="CH-00001">
+                                </div>
+                            </div>
+
+                            <div class="sifa-group" id="account_email">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="d1-email" placeholder="jane@example.com">
+                                <div class="sifa-element validation-fail" id="val_email"></div>
+                            </div>
+
+                            <!-- Outcome Panel -->
+                            <div style="opacity: 0.4; font-family: monospace; text-transform: uppercase;">SIFA.outcome.answers</div>
+                            <div class="outcome-panel" id="d1outcome"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <br/><br/><br/>
+            <section class="sample_block sample-reverse">
+                <div>
+                    <p style="color:var(--accent-color); font-size: 0.8em;">● LIVE DEMO</p>
+                    <div class="live_form">
+                        <div class="form-card-bar">
+                            <div style="display: flex; gap: 0.5em; font-size: 0.8em;">
+                                <div>🔴</div>
+                                <div>🟡</div>
+                                <div>🟢</div>
+                            </div>
+                            <div style="color:var(--page1-ink);">product-configurator.sifa</div>
+                        </div>
+                        <div class="form-card-body">
+
+                            <div class="sifa-group">
+                                <label class="form-label">Product</label>
+                                <div style="display:grid; grid-template-columns: 1fr;">
+                                    <select name="product" id="d2-product" class="form-input">
+                                        <option value="">Select a product</option>
+                                        <option value="basic">Basic Widget</option>
+                                        <option value="pro">Pro Widget</option>
+                                        <option value="ultra">Ultra Widget</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br/>
+
+                            <div class="sifa-group">
+                                <label class="form-label">Color Finish</label>
+                                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr;">
+                                    <label class="radio-option" data-val="standard">
+                                        <input type="radio" name="color" value="standard"> ⬜ Standard
+                                    </label>
+                                    <label class="radio-option" data-val="matte">
+                                        <input type="radio" name="color" value="matte"> ⬛ Matte +$4
+                                    </label>
+                                    <label class="radio-option" data-val="gloss">
+                                        <input type="radio" name="color" value="gloss"> ✨ Gloss +$8
+                                    </label>
+                                </div>
+                            </div>
+                            <br/>
+
+                            <div class="sifa-group">
+                                <label class="form-label">Add-ons</label>
+                                <div style="display:grid; grid-template-columns: 1fr 1fr;">
+                                    <label class="radio-option" data-val="eship">
+                                        <input type="checkbox" name="extra1" value="eship"> 🚀 Express Ship +$14.99
+                                    </label>
+                                    <label class="radio-option" data-val="engraving">
+                                        <input type="checkbox" name="extra2" value="engraving"> ✏️ Engraving +$6.99
+                                    </label>
+                                </div>
+                            </div>
+                            <br/>
+
+                            <div class="sifa-group">
+                                <label class="form-label">Quantity</label>
+                                <div style="display:grid; grid-template-columns: 1fr;">
+                                    <input type="range" min="1" max="25" step="1" value="1" id="d2-quantity">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                                        <span style="text-align: left;">1</span>
+                                        <span style="text-align: right;">25</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+
+                            <div class="form-price">
+                                <h2><small>$</small><span id="unitpriceplus">0.00</span></h2>
+                                <small><span id="unitqty">1</span> UNIT x $<span id="unitprice">0.00</span> EACH</small>
+                            </div>
+                            <br/><br/>
+                            <div id="bomlist"></div>
+                            <hr/>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; font-weight: bold;">
+                                <span style="text-align: left;">Total</span>
+                                <span style="text-align: right;" id="totalprice">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <br/><br/>
+                    <h1>02</h1>
+                    <div class="demo-tag tag-orange">PRICE RULES · BOM</div>
+                    <h3>Dynamic Product Configurator & Pricing</h3>
+                    <p>
+                        Each selection adds items to the MBOM. Price rules calculate a sale price.
+                    </p>
+                    <ul class="demo-features">
+                        <li>addBomItem on CHANGE</li>
+                        <li>Calculate bom unit total</li>
+                        <li>setVariable to track running total</li>
+                    </ul>
+                    <br/>
+                    <pre class="code_hint">
+if(sifa_getValue("field_product") == "basic"){
+    sifa_addBomItem("base", {
+        "sku":"base", 
+        "description":"Base (widget a)", 
+        "unitcost":24.99
+    });
+}else{ false }</pre>
+                </div>
+                
+            </section>
+            <br/><br/>
+        </div>
+    </section>
+
+    <script type="module">
+        import SifaEngine from '../sifa.engine.js';
+
+        new SifaEngine({
+            debug: false,
+            events: {
+                CHANGE: (target, outcome) => {
+                    // Display the current answers in the outcome panel
+                    let d1outcome = document.getElementById("d1outcome");
+                    d1outcome.innerHTML = SIFA.outcome.answers!='null' ? "{" + Object.entries(SIFA.outcome.answers).map(([key, val]) => val!==null ? `<div> &nbsp; &nbsp; <span style="color:#7ec8a4;">"${key}"</span> : <span style="color:#c792ea;">"${val}"</span></div>` : '').join('') + "}" : null;
+                
+                    // build BOM on screen
+                    let total = 0;
+                    let bomlist = document.getElementById("bomlist");
+                    bomlist.innerHTML = Object.keys(SIFA.outcome.mbom).length > 0 ? `<ul>${Object.values(SIFA.outcome.mbom).map(item => `<li>${item.description} - $${item.unitcost}</li>`).join('')}</ul>` : '';
+                    total = Object.values(SIFA.outcome.mbom).reduce((acc, item) => acc + item.unitcost, 0);
+
+                    let totalprice = document.getElementById("totalprice");
+                    let unitprice = document.getElementById("unitprice");
+                    let unitpriceplus = document.getElementById("unitpriceplus");
+                    let unitqty = document.getElementById("unitqty");
+                    let qty = SIFA.outcome.answers.field_d2_quantity ? parseInt(SIFA.outcome.answers.field_d2_quantity) : 1;
+                    unitqty.innerHTML = qty;
+                    unitprice.innerHTML = total.toFixed(2);
+                    unitpriceplus.innerHTML = (total * qty).toFixed(2);
+                    totalprice.innerHTML = `$${(total * qty).toFixed(2)}`;
+                }
+            },
+            rules: [
+                {
+                    event: 'LOAD',
+                    enable: true,
+                    priority: 0,
+                    desc: 'reg form, pre set  option',
+                    rules: [
+                        {
+                            ref: 'reg_preset',
+                            enable: true,
+                            priority: 0,
+                            active: 'true',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_account_companyname")',
+                                'sifa_hideElement("group_account_taxid")',
+                                'sifa_hideElement("group_account_organisationname")',
+                                'sifa_hideElement("group_account_charitynumber")',
+                                'sifa_setValue("field_account_type", "personal")'
+                            ],
+                            false_actions: []
+                        }
+                    ]
+                },
+                {
+                    event: 'CHANGE',
+                    enable: true,
+                    priority: 0,
+                    desc: 'show / hide fields based on account type',
+                    rules: [
+                        {
+                            ref: 'account_type_change',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("personal")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_account_companyname")',
+                                'sifa_hideElement("group_account_taxid")',
+                                'sifa_hideElement("group_account_organisationname")',
+                                'sifa_hideElement("group_account_charitynumber")',
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'account_type_change',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("business")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_account_companyname")',
+                                'sifa_hideElement("group_account_taxid")',
+                                'sifa_hideElement("group_account_organisationname")',
+                                'sifa_hideElement("group_account_charitynumber")',
+                                'sifa_showElement("group_account_companyname")',
+                                'sifa_showElement("group_account_taxid")'
+                            ],
+                            false_actions: []
+                        },
+                        {
+                            ref: 'account_type_change',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("nonprofit")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_hideElement("group_account_companyname")',
+                                'sifa_hideElement("group_account_taxid")',
+                                'sifa_hideElement("group_account_organisationname")',
+                                'sifa_hideElement("group_account_charitynumber")',
+                                'sifa_showElement("group_account_organisationname")',
+                                'sifa_showElement("group_account_charitynumber")'
+                            ],
+                            false_actions: []
+                        }
+                    ]
+                },
+                {
+                    event: 'CHANGE',
+                    enable: true,
+                    priority: 0,
+                    desc: 'TAXID validation visual feedback',
+                    rules: [
+                        {
+                            ref: 'TAXID_VALIDATION',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("field_d1_abn")',
+                            condition: 'sifa_length(sifa_getValue("field_d1_abn"))>=8',
+                            true_actions: [
+                                'sifa_showElement("ele_val_taxid")',
+                                'sifa_setElementText("ele_val_taxid", "✓ ABN format valid")',
+                                'sifa_setElementStyle("ele_val_taxid", "color", "rgba(0, 128, 0, 1)")',
+                                'sifa_setElementStyle("ele_val_taxid", "background", "rgba(0, 128, 0, 0.08)")',
+                                'sifa_setElementStyle("ele_val_taxid", "border", "1px solid rgba(0, 128, 0, 0.2)")'
+                            ],
+                            false_actions: [
+                                'sifa_showElement("ele_val_taxid")',
+                                'sifa_setElementText("ele_val_taxid", "✗ ABN needs 8 digits")',
+                                'sifa_setElementStyle("ele_val_taxid", "color", "rgba(212, 68, 15, 1)")',
+                                'sifa_setElementStyle("ele_val_taxid", "background", "rgba(212, 68, 15, 0.08)")',
+                                'sifa_setElementStyle("ele_val_taxid", "border", "1px solid rgba(212, 68, 15, 0.2)")'
+                            ]
+                        }
+                    ]
+                },
+                {
+                    event: 'CHANGE',
+                    enable: true,
+                    priority: 0,
+                    desc: 'Email validation visual feedback',
+                    rules: [
+                        {
+                            ref: 'EMAIL_VALIDATION',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("field_d1_email")',
+                            condition: 'sifa_checkPattern(sifa_getValue("field_d1_email"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")',
+                            true_actions: [
+                                'sifa_showElement("ele_val_email")',
+                                'sifa_setElementText("ele_val_email", "✓ Email format valid")',
+                                'sifa_setElementStyle("ele_val_email", "color", "rgba(0, 128, 0, 1)")',
+                                'sifa_setElementStyle("ele_val_email", "background", "rgba(0, 128, 0, 0.08)")',
+                                'sifa_setElementStyle("ele_val_email", "border", "1px solid rgba(0, 128, 0, 0.2)")'
+                            ],
+                            false_actions: [
+                                'sifa_showElement("ele_val_email")',
+                                'sifa_setElementText("ele_val_email", "✗ Email format invalid")',
+                                'sifa_setElementStyle("ele_val_email", "color", "rgba(212, 68, 15, 1)")',
+                                'sifa_setElementStyle("ele_val_email", "background", "rgba(212, 68, 15, 0.08)")',
+                                'sifa_setElementStyle("ele_val_email", "border", "1px solid rgba(212, 68, 15, 0.2)")'
+                            ]
+                        }
+                    ]
+                },
+                {
+                    event: 'CHANGE',
+                    enable: true,
+                    priority: 0,
+                    desc: 'Product selection visual feedback',
+                    rules: [
+                        {
+                            ref: 'PRODUCT_SELECTION',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("field_product")',
+                            condition: 'sifa_inputHasValue("field_product")',
+                            true_actions: [
+                                'sifa_getValue("field_product") == "basic" ? sifa_addBomItem("base", {"sku":"base", "description":"Base (widget a)", "unitcost":24.99}) : false',
+                                'sifa_getValue("field_product") == "pro" ? sifa_addBomItem("base", {"sku":"base", "description":"Base (widget b)", "unitcost":54.99}) : false',
+                                'sifa_getValue("field_product") == "ultra" ? sifa_addBomItem("base", {"sku":"base", "description":"Base (widget b)", "unitcost":119.99}) : false'
+                            ],
+                            false_actions: [
+                                'sifa_removeBomItem("base")'
+                            ]
+                        },
+                        {
+                            ref: 'COLOR_SELECTION',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("matte") || sifa_triggeredField("gloss")',
+                            condition: 'sifa_inputHasValue("field_color")',
+                            true_actions: [
+                                'sifa_answerContains("field_color", "matte") ? sifa_addBomItem("finish", {"sku":"finish", "description":"Finish (matte)", "unitcost":4.00}) : false',
+                                'sifa_answerContains("field_color", "gloss") ? sifa_addBomItem("finish", {"sku":"finish", "description":"Finish (gloss)", "unitcost":8.00}) : false',
+                            ],
+                            false_actions: [
+                                'sifa_removeBomItem("finish")'
+                            ]
+                        },
+                        {
+                            ref: 'ADDONS_SELECTION',
+                            enable: true,
+                            priority: 0,
+                            active: 'sifa_triggeredField("eship") || sifa_triggeredField("engraving")',
+                            condition: 'true',
+                            true_actions: [
+                                'sifa_answerContains("field_extra1", "eship") ? sifa_addBomItem("addon1", {"sku":"addon1", "description":"E-Ship", "unitcost":4.00}) : sifa_removeBomItem("addon1")',
+                                'sifa_answerContains("field_extra2", "engraving") ? sifa_addBomItem("addon2", {"sku":"addon2", "description":"Engraving", "unitcost":8.00}) : sifa_removeBomItem("addon2")',
+                            ],
+                            false_actions: []
+                        }
+                    ]
+                }
+            ]
+        });
+
+        // checkPattern(string, pattern)
+
+        console.log(SIFA);
+    </script>
+</body>
+</html>

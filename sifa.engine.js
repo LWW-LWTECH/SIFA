@@ -111,7 +111,7 @@ export default class SifaEngine {
     setSettings(set={}){
         const {  validationRules = [], variables = {}, answers = {}, rules = [], ...rest } = set;
         SIFA.settings = {
-            targetInput: '.sifa-input',
+            targetInput:   '.sifa-input',
             targetGroup:   '.sifa-group',
             targetElement: '.sifa-element',
             targetValidation: null,
@@ -147,93 +147,60 @@ export default class SifaEngine {
         await SIFA.onLoadEvent();
     }
     scanPageElements(){
-
         const slugify = str => str.toString().toLowerCase().replace(/[ -]/g, '_');
-        const resolveTag = (el, index) => slugify(el.id || el.dataset.tag || index);
-
-        // Utility function to register input elements and create references for easy access
-        const registerInput = (el, input, index) => {
-            const key = `field_${slugify(input.name || input.id || index)}`;
-            if (input.type === 'radio' || input.type === 'checkbox') {
-                input.sifaRef = `${input.value}`;
-                input.sifaPRef = `${key}`;
-                (SIFA.elements[key] ??= {})[input.value] = input;
-                SIFA.outcome.answers[key] = null;
-                // return;
-            }else if(input.tagName.toUpperCase() === 'SELECT') {
-                input.sifaRef = key;
-                input.baseOptions = [...input.options].map(o => ({ value: o.value, text: o.text }));
-                SIFA.elements[key] = input;
-                SIFA.outcome.answers[key] = null;
-            }else{
-                input.sifaRef = key;
-                SIFA.elements[key] = input;
-                SIFA.outcome.answers[key] = null;
-            }
-        };
-
-        const registerLabel = (el, index) => {
-            const key = `label_${slugify(el.getAttribute('for') || el.id || index)}`;
-            el.sifaRef = key;
-            SIFA.elements[key] = el;
+        const registerElement = (prefix, ele, index) => {
+            // Register
+            const key = `${prefix}_${slugify(ele.name || ele.id || ele.dataset.tag || index)}`;
+            if (SIFA.elements[key]) return;
+            ele.sifaRef = key;
+            SIFA.elements[key] = ele;
+            return ele;
         }
-
-        const registerButton = (el, index) => {
-            const key = `button_${slugify(el.id || el.name || index)}`;
-            el.sifaRef = key;
-            SIFA.elements[key] = el;
-        }
-
-        const registerElement = (el, index) => {
-            const key = `ele_${slugify(el.id || el.dataset.tag || index)}`;
-            el.sifaRef = key;
-            SIFA.elements[key] = el;
-        }
-
-        const attachListeners = (el) => {
-            el.addEventListener('change', e => SIFA.onChangeEvent(e.target));
-            el.addEventListener('input',  e => SIFA.onInputEvent(e.target));
-            el.addEventListener('click',  e => SIFA.onClickEvent(e.target));
-        };
-
-        const scanElements = (selector, prefix, callback) => {
-            document.querySelectorAll(selector).forEach((el, index) => {
-                const tag = `${prefix}_${resolveTag(el, index)}`;
-                if (SIFA.elements[tag]) return; // skip if already registered
-                el.sifaTag = tag;
-                SIFA.elements[tag] = el;
-                callback?.(el, index);
-            });
-        };
-
-        // Scan target class elements
-        scanElements(`${SIFA.settings.targetInput}`, 'ele', (el, index) => {
-            // attachListeners(el);
-            el.querySelectorAll('input, select, textarea').forEach(input => {
-                registerInput(el, input, index);
+        const registerFieldsButtonsLabels = (fieldele) => {
+            // fields
+            fieldele.querySelectorAll('input, select, textarea').forEach((input, idx) => {
+                input.addEventListener('click', e => SIFA.onChangeEvent(e.target));
                 input.addEventListener('change', e => SIFA.onChangeEvent(e.target));
+                input.addEventListener('input', e => SIFA.onChangeEvent(e.target));
+                const key = `field_${slugify(input.name || input.id || input.dataset.tag || idx)}`;
+                SIFA.outcome.answers[key] = null;
+                if(input.type === 'radio' || input.type === 'checkbox'){
+                    input.sifaRef = input.value; input.sifaPRef = key;
+                    if(!SIFA.elements[key]) SIFA.elements[key] = {};
+                    SIFA.elements[key][input.value] = input;
+                }else{
+                    input.sifaRef = key;
+                    SIFA.elements[key] = input;
+                }
             });
-            el.querySelectorAll('label').forEach(label => {
-                registerLabel(label, index);
-            });
-            el.querySelectorAll('button').forEach(button => {
-                registerButton(button, index);
+            // buttons
+            fieldele.querySelectorAll('button').forEach((button, idx) => {
+                const key = `button_${slugify(button.name || button.id || button.dataset.tag || idx)}`;
+                button.sifaRef = key;
+                SIFA.elements[key] = button;
                 button.addEventListener('click', e => SIFA.onClickEvent(e.target));
             });
-        });
+            // labels
+            fieldele.querySelectorAll('label').forEach((label, idx) => {
+                const key = `label_${slugify(label.name || label.id || label.dataset.tag || idx)}`;
+                label.sifaRef = key;
+                SIFA.elements[key] = label;
+            });
+        }
 
-        scanElements(`${SIFA.settings.targetElement}`, 'ele', (el, index) => {
-            registerElement(el, index);
+        // Scan Inputs
+        document.querySelectorAll(SIFA.settings.targetInput).forEach((fieldele, index) => {
+            registerFieldsButtonsLabels(fieldele);
         });
-
+        // Scan elements
+        document.querySelectorAll(SIFA.settings.targetElement).forEach((element, index) => {
+            registerElement('ele', element, index);
+            registerFieldsButtonsLabels(element);
+        });
         // Scan group elements
-        // const defaultGroupSelectors = ['details', 'section', 'fieldset', 'article'];
-        scanElements(SIFA.settings.targetGroup, 'group', (el, index) => {
-            // lookup buttons
-            el.querySelectorAll('button').forEach(button => {
-                registerButton(button, index);
-                button.addEventListener('click', e => SIFA.onClickEvent(e.target));
-            });
+        document.querySelectorAll(SIFA.settings.targetGroup + ', detail, section').forEach((group, index) => {
+            registerElement('group', group, index);
+            registerFieldsButtonsLabels(group);
         });
     }
 
@@ -255,9 +222,9 @@ export default class SifaEngine {
     async onChangeEvent(target){
         SIFA.outcome.logs = []; // clear logs on each action processing
         SIFA.triggerInput = target;
+
         const baseKey = target.type === 'checkbox' || target.type === 'radio' ? target.sifaPRef : target.sifaRef;
         const valKey  = target.type === 'checkbox' || target.type === 'radio' ? target.sifaRef : null;
-
         const value = target.type === 'checkbox' || target.type === 'radio'
             ? Object.values(SIFA.elements[baseKey]).filter(i => i.checked).map(i => i.value)
             : target.value;

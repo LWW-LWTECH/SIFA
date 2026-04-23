@@ -551,11 +551,11 @@ new SifaEngine({
                     active: 'true',
                     condition: 'true',
                     true_actions: [
-                        'sifa_getValue("field_size")=="small" ?             sifa_addPriceLine("pizza_price", "base price", "pizza", 14, "UNIT", true) : null',
-                        'sifa_getValue("field_size")=="medium" ?            sifa_addPriceLine("pizza_price", "base price", "pizza", 18, "UNIT", true) : null',
-                        'sifa_getValue("field_size")=="large" ?             sifa_addPriceLine("pizza_price", "base price", "pizza", 24, "UNIT", true) : null',
-                        'sifa_getValue("field_crust")=="stuffed" ?          sifa_addPriceLine("pizza_crust", "base price", "pizza", 3.50, "UNIT", true) : null',
-                        'sifa_getValue("field_crust")=="glutenfree" ?       sifa_addPriceLine("pizza_crust", "base price", "pizza", 4.00, "UNIT", true) : null',
+                        'sifa_answerContains("field_size", "small") ?             sifa_addPriceLine("pizza_price", "base price", "pizza", 14, "UNIT", true) : null',
+                        'sifa_answerContains("field_size", "medium") ?            sifa_addPriceLine("pizza_price", "base price", "pizza", 18, "UNIT", true) : null',
+                        'sifa_answerContains("field_size", "large") ?             sifa_addPriceLine("pizza_price", "base price", "pizza", 24, "UNIT", true) : null',
+                        'sifa_answerContains("field_crust", "stuffed") ?          sifa_addPriceLine("pizza_crust", "base price", "pizza", 3.50, "UNIT", true) : null',
+                        'sifa_answerContains("field_crust", "glutenfree") ?       sifa_addPriceLine("pizza_crust", "base price", "pizza", 4.00, "UNIT", true) : null',
 
                         'sifa_answerContains("field_extras", "extra_cheese") ?    sifa_addPriceLine("extra_cheese", "additional price", "extra", 2.00, "UNIT", true) : null',
                         'sifa_answerContains("field_extras", "garlic_bread") ?    sifa_addPriceLine("garlic_bread", "additional price", "extra", 5.00, "UNIT", true) : null',
@@ -567,9 +567,9 @@ new SifaEngine({
                         'sifa_setElementText("ele_sum_extras_price", "$" + sifa_getPriceTypeTotal("extra").toFixed(2))',
                         'sifa_setElementText("ele_sum_total", "$" + sifa_getPriceTotal("pizza_price"))',
 
-                        'sifa_getValue("field_size")=="small" ?             sifa_setVariable("toppings_limit", 3) : null',
-                        'sifa_getValue("field_size")=="medium" ?            sifa_setVariable("toppings_limit", 4) : null',
-                        'sifa_getValue("field_size")=="large" ?             sifa_setVariable("toppings_limit", 5) : null',
+                        'sifa_answerContains("field_size", "small") ?             sifa_setVariable("toppings_limit", 3) : null',
+                        'sifa_answerContains("field_size", "medium") ?            sifa_setVariable("toppings_limit", 4) : null',
+                        'sifa_answerContains("field_size", "large") ?             sifa_setVariable("toppings_limit", 5) : null',
                     ],
                     false_actions: []
                 },

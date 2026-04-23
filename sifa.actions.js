@@ -674,6 +674,16 @@ export function resetOptions(ref){
         return true;
     }else{ console.warn('resetOptions requires the input to be a select or select-multiple'); return false; }
 }
+export function checkPattern(string, pattern){
+    try{
+        let inputs = sifa_checkIfNestedOutcomeMulti({string:string, pattern:pattern});
+        let regex = new RegExp(inputs.pattern);
+        return regex.test(inputs.string);
+    }catch(e){
+        console.warn("Error in checkPattern:", e);
+        return false;
+    }
+}
 
 // CONDITION CHECKS
 export function triggeredField(ref){
@@ -1023,7 +1033,7 @@ export function division(value1, value2){
 export function addBomItem(item, data){
     let inputs = sifa_checkIfNestedOutcomeMulti({item:item});
     let row = {
-        "sku": inputs.item,
+        "sku": data.sku ? data.sku : inputs.item,
         "description": data.description ? data.description : '',
         "revision": data.revision ? data.revision : '',
         "parent_sku": data.parent_sku ? data.parent_sku : '',
@@ -1033,9 +1043,7 @@ export function addBomItem(item, data){
         "price": data.price ? data.price : 0
     };
     row = {...row, ...data};
-    let rowIndex = Object.keys(SIFA.outcome.mbom).length;
-    row.line = rowIndex + 1;
-    SIFA.outcome.mbom[row.sku + "_" + row.line] = row;
+    SIFA.outcome.mbom[inputs.item] = row;
 }
 export function removeBomItem(item){
     SIFA.outcome.mbom[item] !== undefined ? delete SIFA.outcome.mbom[item] : null;
